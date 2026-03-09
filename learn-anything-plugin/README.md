@@ -4,6 +4,19 @@ A Claude Code plugin that helps people learn any skill efficiently. It synthesiz
 
 The system is domain-agnostic: Spanish, guitar, negotiation, programming, pharmacology, cooking, chess — any skill.
 
+## Commands
+
+| Command | Purpose |
+|---|---|
+| `/learn [topic or context]` | Primary interface — start, resume, or manage any skill |
+| `/train [context]` | Jump straight into a training session |
+
+`/learn` delegates to the orchestrator, which handles everything: new skills, resuming, switching, progress checks, material generation, imports, and plan updates. Just describe what you want naturally — `/learn Spanish`, `/learn progress`, `/learn I'm stuck on chord transitions`.
+
+`/train` is a shortcut that skips directly to the Training Conductor for your active skill.
+
+The orchestrator also activates automatically for natural-language requests like "I want to learn Spanish" or "teach me guitar".
+
 ## Pipeline
 
 Eight skills form a sequential pipeline, managed by the orchestrator:
