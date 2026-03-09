@@ -74,15 +74,47 @@ Each skill gets its own workspace under `learn-anything/<skill-slug>/` in the us
 
 ## Prerequisites
 
-Python 3 with the `genanki` package (for Anki deck export):
+Python 3 with the `genanki` package (required for Anki deck export by the Material Forge skill):
 
 ```bash
+# Using uv (recommended)
+uv pip install -r requirements.txt
+
+# Or using pip
 pip install -r requirements.txt
 ```
 
 ## Installation
 
-Add this plugin to your Claude Code configuration. The 8 skills will be auto-discovered from the `skills/` directory.
+### From the marketplace
+
+If this plugin is published to a GitHub-based marketplace:
+
+```bash
+# In Claude Code, run:
+/plugin marketplace add NetRxn/learn-anything
+```
+
+Then enable the plugin when prompted. All 8 skills are auto-discovered from the `skills/` directory.
+
+### From a local path (for development or testing)
+
+```bash
+# In Claude Code, run:
+/plugin marketplace add /path/to/learn-anything
+```
+
+### Verify installation
+
+Once installed, the `meta-learning-orchestrator` skill activates automatically when you say things like "I want to learn Spanish" or "teach me guitar". You can also check `/plugin` to confirm the plugin is enabled.
+
+### Add to your project's .gitignore
+
+The plugin writes learner state to a `learn-anything/` directory in your project. Add this to your project's `.gitignore`:
+
+```
+learn-anything/
+```
 
 ## Key Frameworks
 
