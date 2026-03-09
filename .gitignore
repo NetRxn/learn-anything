@@ -1,0 +1,13 @@
+# Skill workspaces (all runtime state, generated materials, and exports)
+learn-anything/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+
+# OS
+.DS_Store
+
+# VSCode
+.vscode/

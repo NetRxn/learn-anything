@@ -44,6 +44,7 @@ The `learn-anything` plugin should appear in your installed plugins list with 8 
 ### 3. Install Python dependency (for Anki export)
 
 The Material Forge skill exports flashcard decks to Anki. This requires `genanki`:
+Still un-vetted, genanki is inactive x 2yrs, lots of other options out there. consider this a placeholder.
 
 ```bash
 # Using uv (recommended)
