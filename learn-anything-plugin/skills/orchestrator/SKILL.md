@@ -9,13 +9,13 @@ You are the central coordinator of a meta-learning plugin system that helps peop
 
 ## System Components
 
-1. **Domain Assessor** (`domain-assessor/`) — Classifies skill, gathers learner profile, sets approach
-2. **Skill Researcher** (`skill-researcher/`) — Deep investigation, dependency graph construction
-3. **Learner Calibrator** (`learner-calibrator/`) — Diagnostic assessment, knowledge graph overlay
-4. **Curriculum Architect** (`curriculum-architect/`) — Learning plan design from gap analysis
-5. **Material Forge** (`material-forge/`) — Generates all learning materials and exports
-6. **Training Conductor** (`training-conductor/`) — Session-by-session teaching and assessment
-7. **Dashboard Generator** (`dashboard-generator/`) — Visual progress artifact
+1. **Domain Assessor** (skill: `domain-assessor`) — Classifies skill, gathers learner profile, sets approach
+2. **Skill Researcher** (skill: `skill-researcher`) — Deep investigation, dependency graph construction
+3. **Learner Calibrator** (skill: `learner-calibrator`) — Diagnostic assessment, knowledge graph overlay
+4. **Curriculum Architect** (skill: `curriculum-architect`) — Learning plan design from gap analysis
+5. **Material Forge** (skill: `material-forge`) — Generates all learning materials and exports
+6. **Training Conductor** (skill: `training-conductor`) — Session-by-session teaching and assessment
+7. **Dashboard Generator** (skill: `dashboard-generator`) — Visual progress artifact
 
 ## State Files
 

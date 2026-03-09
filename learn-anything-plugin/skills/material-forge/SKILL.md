@@ -15,7 +15,7 @@ Before starting, read:
 3. `schemas/srs-cards.schema.json` — Flashcard output format
 4. `references/card-design-guide.md` — Card design principles and anti-patterns
 5. `references/quality-rubrics.md` — Quality checks for all material types
-6. `references/session-templates.md` — Session templates (for designing template-aligned materials)
+6. `../training-conductor/references/session-templates.md` — Session templates (for designing template-aligned materials)
 
 ## Generation Modes
 
@@ -50,7 +50,7 @@ anki_config = {
 ```
 Store in srs-cards.json and NEVER change these IDs.
 
-Write the complete card set to `srs-cards.json` conforming to the schema. Then run `scripts/generate_anki.py srs-cards.json` to produce the .apkg file.
+Write the complete card set to `srs-cards.json` conforming to the schema. Then run the Anki export script at `scripts/generate_anki.py` (located within this skill's directory) with `srs-cards.json` as input to produce the .apkg file.
 
 ### 2. Worked Examples with Backward Fading
 

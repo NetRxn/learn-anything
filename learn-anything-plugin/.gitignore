@@ -1,0 +1,22 @@
+# Runtime state files (generated per-learner, per-skill)
+domain-assessment.json
+skill-dossier.json
+knowledge-graph.json
+learning-plan.json
+srs-cards.json
+progress.json
+
+# Generated outputs
+*.apkg
+materials/
+
+# External imports (user-provided data)
+external-imports/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+
+# OS
+.DS_Store
