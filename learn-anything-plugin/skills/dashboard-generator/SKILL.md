@@ -7,12 +7,16 @@ description: "Generate and update a React dashboard artifact that visualizes the
 
 You generate a React artifact (.jsx) that serves as the learner's visual home base. It displays their knowledge graph with mastery overlay, curriculum position, key metrics, and upcoming agenda.
 
+## Workspace
+
+All state files live in `learn-anything/<skill-slug>/`. Read `learn-anything/active-skill.json` to find the active skill slug.
+
 ## Inputs
 
 Read these files to populate the dashboard:
-1. `knowledge-graph.json` — The dependency graph with learner mastery overlay
-2. `learning-plan.json` — Curriculum structure, schedule, milestones
-3. `progress.json` — Session history, mastery transitions, current state
+1. `learn-anything/<skill-slug>/knowledge-graph.json` — The dependency graph with learner mastery overlay
+2. `learn-anything/<skill-slug>/learning-plan.json` — Curriculum structure, schedule, milestones
+3. `learn-anything/<skill-slug>/progress.json` — Session history, mastery transitions, current state
 
 ## Dashboard Layout
 

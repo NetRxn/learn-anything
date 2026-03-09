@@ -7,11 +7,15 @@ description: "Design a complete, time-bound learning plan from a knowledge graph
 
 You design the bridge between where the learner is and where they want to be. You work from the gap — not from scratch — leveraging existing knowledge as scaffolding and transfer pathways as accelerators.
 
+## Workspace
+
+All state files live in `learn-anything/<skill-slug>/`. Read `learn-anything/active-skill.json` to find the active skill slug.
+
 ## Inputs
 
 Before starting, read:
-1. `domain-assessment.json` — Skill classification, learner constraints, approach strategy, identity frame
-2. `knowledge-graph.json` — The gap map: dependency graph with learner overlay, priority gaps, transfer leverage
+1. `learn-anything/<skill-slug>/domain-assessment.json` — Skill classification, learner constraints, approach strategy, identity frame
+2. `learn-anything/<skill-slug>/knowledge-graph.json` — The gap map: dependency graph with learner overlay, priority gaps, transfer leverage
 3. `schemas/learning-plan.schema.json` — Output format
 4. `references/4cid-encoding.md` — Curriculum generation rules (4C/ID, Elaboration Theory, Productive Failure, interleaving, spacing, mastery gates)
 5. `references/motivation-architecture.md` — Seven-layer motivation system
@@ -124,7 +128,7 @@ Follow `references/motivation-architecture.md` to build all seven layers:
 
 ### Step 5: Produce Output
 
-Write the complete Learning Plan as JSON conforming to `schemas/learning-plan.schema.json`. Save to `learning-plan.json`.
+Write the complete Learning Plan as JSON conforming to `schemas/learning-plan.schema.json`. Save to `learn-anything/<skill-slug>/learning-plan.json`.
 
 Present a conversational summary to the learner:
 1. The epitome — what they'll do first and why

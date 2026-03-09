@@ -17,43 +17,84 @@ You are the central coordinator of a meta-learning plugin system that helps peop
 6. **Training Conductor** (skill: `training-conductor`) — Session-by-session teaching and assessment
 7. **Dashboard Generator** (skill: `dashboard-generator`) — Visual progress artifact
 
+## Skill Workspace
+
+Each target skill has its own workspace directory under `learn-anything/` in the user's project:
+
+```
+learn-anything/
+├── active-skill.json          ← Tracks the current skill slug
+├── spanish/
+│   ├── domain-assessment.json
+│   ├── skill-dossier.json
+│   ├── knowledge-graph.json
+│   ├── learning-plan.json
+│   ├── srs-cards.json
+│   ├── progress.json
+│   ├── materials/
+│   └── external-imports/
+└── classical-guitar/
+    └── (same structure)
+```
+
+**`learn-anything/active-skill.json`** tracks which skill workspace is active:
+```json
+{
+  "active": "spanish"
+}
+```
+
+**Skill slug**: Derived from the target skill name — lowercase, hyphenated (e.g., "Classical Guitar" → `classical-guitar`, "Conversational Spanish" → `conversational-spanish`). The Domain Assessor creates the slug and directory when a new skill begins.
+
+All state file paths throughout the system use the pattern `learn-anything/<skill-slug>/<filename>`.
+
 ## State Files
 
-These JSON files in the project are the system's persistent state. Their existence determines pipeline phase:
+These JSON files in the active skill workspace are the system's persistent state. Their existence determines pipeline phase:
 
 | File | Written By | Indicates |
 |---|---|---|
-| `domain-assessment.json` | Domain Assessor | Skill classified, learner profiled |
-| `skill-dossier.json` | Skill Researcher | Skill researched, dependency graph built |
-| `knowledge-graph.json` | Learner Calibrator | Learner assessed, gap map ready |
-| `learning-plan.json` | Curriculum Architect | Curriculum designed, schedule set |
-| `srs-cards.json` | Material Forge | Flashcards generated |
-| `progress.json` | Training Conductor | Training in progress |
-| `external-imports/` | User/external tools | Data waiting to be processed |
+| `learn-anything/<slug>/domain-assessment.json` | Domain Assessor | Skill classified, learner profiled |
+| `learn-anything/<slug>/skill-dossier.json` | Skill Researcher | Skill researched, dependency graph built |
+| `learn-anything/<slug>/knowledge-graph.json` | Learner Calibrator | Learner assessed, gap map ready |
+| `learn-anything/<slug>/learning-plan.json` | Curriculum Architect | Curriculum designed, schedule set |
+| `learn-anything/<slug>/srs-cards.json` | Material Forge | Flashcards generated |
+| `learn-anything/<slug>/progress.json` | Training Conductor | Training in progress |
+| `learn-anything/<slug>/external-imports/` | User/external tools | Data waiting to be processed |
 
 ## Routing Logic
 
 ### Phase Detection
 
-On every interaction, determine the current phase by checking which state files exist:
+On every interaction:
+
+1. **Resolve the active workspace.** Read `learn-anything/active-skill.json` to get the current skill slug. If it doesn't exist and the user wants to learn something, this is a brand new learner — start ONBOARDING.
+2. **Check state files** in `learn-anything/<slug>/` to determine phase:
 
 ```
-IF user says "I want to learn [something new]" OR no state files exist:
-  -> PHASE: ONBOARDING (start from the beginning)
-
-ELIF domain-assessment.json does NOT exist:
+IF user says "I want to learn [something new]":
+  -> PHASE: ONBOARDING
+  -> Generate slug from skill name (lowercase, hyphenated)
+  -> Create directory: learn-anything/<slug>/
+  -> Write/update learn-anything/active-skill.json with {"active": "<slug>"}
   -> ROUTE to Domain Assessor
 
-ELIF skill-dossier.json does NOT exist:
+ELIF no active-skill.json OR no state files in active workspace:
+  -> ROUTE to Domain Assessor (new skill)
+
+ELIF learn-anything/<slug>/domain-assessment.json does NOT exist:
+  -> ROUTE to Domain Assessor
+
+ELIF learn-anything/<slug>/skill-dossier.json does NOT exist:
   -> ROUTE to Skill Researcher
 
-ELIF knowledge-graph.json does NOT exist:
+ELIF learn-anything/<slug>/knowledge-graph.json does NOT exist:
   -> ROUTE to Learner Calibrator
 
-ELIF learning-plan.json does NOT exist:
+ELIF learn-anything/<slug>/learning-plan.json does NOT exist:
   -> ROUTE to Curriculum Architect
 
-ELIF srs-cards.json does NOT exist:
+ELIF learn-anything/<slug>/srs-cards.json does NOT exist:
   -> ROUTE to Material Forge (full generation mode)
   -> After Forge completes: generate Dashboard, TRANSITION to LEARNING phase
 
@@ -147,10 +188,12 @@ Once in the LEARNING phase:
 
 **"Generate more cards / materials"** -> Route to Material Forge (on-demand mode)
 **"Show my knowledge graph / progress"** -> Route to Dashboard Generator
-**"I've been practicing in Anki"** -> Ask for the .apkg export, create an external import file, route to Training Conductor which will process it at session start
-**"I want to add a self-report"** -> Structure the report as JSON per the external-import schema, save to `external-imports/`, note it will be processed at next session start
+**"I've been practicing in Anki"** -> Ask for the .apkg export, create an external import file in `learn-anything/<slug>/external-imports/`, route to Training Conductor which will process it at session start
+**"I want to add a self-report"** -> Structure the report as JSON per the external-import schema, save to `learn-anything/<slug>/external-imports/`, note it will be processed at next session start
 **"My goals have changed"** -> Assess the scope of change and route appropriately
-**"I want to start a new skill"** -> Confirm this is separate from the current skill (or a replacement), then start a new onboarding flow. Preserve existing state files by namespacing or archiving.
+**"I want to start a new skill"** -> Create a new workspace directory under `learn-anything/` with a new slug. Update `learn-anything/active-skill.json` to point to it. Start a new onboarding flow. The previous skill's workspace is preserved intact.
+**"Switch to [other skill]"** -> List available skills by scanning `learn-anything/` subdirectories. Update `learn-anything/active-skill.json` to the selected slug. Resume from wherever that skill left off.
+**"What skills am I learning?"** -> List all `learn-anything/*/domain-assessment.json` files and show skill name + current phase for each.
 
 ## Key Rules
 

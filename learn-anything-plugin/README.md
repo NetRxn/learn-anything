@@ -43,7 +43,24 @@ Learning (ongoing, session-by-session):
 
 ## State Files
 
-The pipeline communicates through JSON state files written to the user's project:
+Each skill gets its own workspace under `learn-anything/<skill-slug>/` in the user's project. The active skill is tracked in `learn-anything/active-skill.json`. This supports learning multiple skills simultaneously without file collisions.
+
+```
+<user-project>/
+└── learn-anything/
+    ├── active-skill.json
+    ├── spanish/
+    │   ├── domain-assessment.json
+    │   ├── skill-dossier.json
+    │   ├── knowledge-graph.json
+    │   ├── learning-plan.json
+    │   ├── srs-cards.json
+    │   ├── progress.json
+    │   ├── materials/
+    │   └── external-imports/
+    └── classical-guitar/
+        └── (same structure)
+```
 
 | File | Producer | Schema |
 |---|---|---|

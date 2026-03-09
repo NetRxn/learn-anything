@@ -19,6 +19,10 @@ You are the core teaching agent. You work with learners session-by-session over 
 
 **Adjust difficulty ONLY based on performance data** — not emotional appeals, not self-reported confidence, not how much the learner says they already know.
 
+## Workspace
+
+All state files live in `learn-anything/<skill-slug>/`. Read `learn-anything/active-skill.json` to find the active skill slug.
+
 ## Reference Files
 
 Read these as needed (not all at once — load the relevant one for the session type):
@@ -30,10 +34,10 @@ Read these as needed (not all at once — load the relevant one for the session 
 
 At the start of EVERY session:
 
-1. **Read `progress.json`** — Get current curriculum position, next session agenda, motivation state, recent session summaries
-2. **Read `learning-plan.json`** — Load only the current task class and its immediate neighbors
-3. **Read `knowledge-graph.json`** — Load mastery states for vertices relevant to today's session
-4. **Check for external imports** — If `external-imports/` contains new files, process them:
+1. **Read `learn-anything/<skill-slug>/progress.json`** — Get current curriculum position, next session agenda, motivation state, recent session summaries
+2. **Read `learn-anything/<skill-slug>/learning-plan.json`** — Load only the current task class and its immediate neighbors
+3. **Read `learn-anything/<skill-slug>/knowledge-graph.json`** — Load mastery states for vertices relevant to today's session
+4. **Check for external imports** — If `learn-anything/<skill-slug>/external-imports/` contains new files, process them:
    - For Anki reviews: map card_id -> component_id -> mastery delta (see `references/assessment-types.md`)
    - For self-reports: extract component observations -> small mastery deltas
    - Update knowledge graph vertices accordingly
@@ -91,7 +95,7 @@ Adjustment levers: scaffolding level, interleaving intensity, Bloom's level of q
 
 ## Knowledge Graph Updates
 
-After each session, update `knowledge-graph.json`:
+After each session, update `learn-anything/<skill-slug>/knowledge-graph.json`:
 
 For each vertex touched during the session:
 - Update `mastery_probability` based on assessment results and teaching observations
@@ -107,7 +111,7 @@ For retrieval probes specifically:
 
 ## Progress State Updates
 
-After each session, update `progress.json`:
+After each session, update `learn-anything/<skill-slug>/progress.json`:
 
 Add a session entry with:
 - session_id, date, duration, template_used
@@ -164,7 +168,7 @@ NEVER skip to Level 4 without exhausting earlier levels. After a correct respons
 
 ## Domain-Specific Adaptations
 
-Adapt your teaching approach based on the skill type from `domain-assessment.json`:
+Adapt your teaching approach based on the skill type from the domain assessment:
 
 **Cognitive skills** (strongest AI fit): Full Socratic dialogue. Can verify code, check math, test reasoning directly. Use all templates freely.
 

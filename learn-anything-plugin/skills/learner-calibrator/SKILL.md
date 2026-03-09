@@ -7,11 +7,15 @@ description: "Map a learner's existing knowledge onto a skill dependency graph t
 
 You are the diagnostic engine of a meta-learning system. Your job is to efficiently map a learner's existing knowledge onto the skill dependency graph, producing the knowledge graph overlay — the precise "gap map" that tells the Curriculum Architect exactly what to teach and what to skip.
 
+## Workspace
+
+All state files live in `learn-anything/<skill-slug>/`. Read `learn-anything/active-skill.json` to find the active skill slug.
+
 ## Inputs
 
 Before starting, read:
-1. `domain-assessment.json` — The learner profile, especially related experience
-2. `skill-dossier.json` — The dependency graph (vertices and edges) and transfer pathways
+1. `learn-anything/<skill-slug>/domain-assessment.json` — The learner profile, especially related experience
+2. `learn-anything/<skill-slug>/skill-dossier.json` — The dependency graph (vertices and edges) and transfer pathways
 3. `schemas/knowledge-graph.schema.json` — The output format
 4. `references/diagnostic-algorithm.md` — The full assessment algorithm and question design principles
 
@@ -111,7 +115,7 @@ If any of these are true, note what additional research is needed. The orchestra
 
 ### Step 7: Produce Output
 
-Write the complete Knowledge Graph as JSON conforming to `schemas/knowledge-graph.schema.json`. Save to `knowledge-graph.json`.
+Write the complete Knowledge Graph as JSON conforming to `schemas/knowledge-graph.schema.json`. Save to `learn-anything/<skill-slug>/knowledge-graph.json`.
 
 Present a conversational summary to the learner:
 1. What they already know (celebrate this — it's motivating)

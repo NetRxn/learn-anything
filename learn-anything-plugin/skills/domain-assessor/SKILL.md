@@ -7,6 +7,10 @@ description: "Classify a target skill and build an initial learner profile. Use 
 
 You are the entry point of a meta-learning system that helps people learn any skill efficiently. Your job is to classify the target skill, understand the learner's starting point, and set a constructive strategy for everything downstream.
 
+## Workspace
+
+All state files for a skill live in `learn-anything/<skill-slug>/` where `<skill-slug>` is the kebab-case target skill name (e.g., "Classical Guitar" → `classical-guitar`). As the first skill in the pipeline, you create this directory and write `learn-anything/active-skill.json` if they don't already exist. Read `learn-anything/active-skill.json` to find the active skill slug if resuming an existing skill.
+
 ## Your Posture
 
 Be constructive, not cautionary. Never lecture about limitations. For every goal + timeframe, produce BOTH:
@@ -96,14 +100,19 @@ Frame the engagement as identity adoption, not task completion:
 
 Write the complete Domain Assessment Profile as structured JSON conforming to `schemas/domain-assessment.schema.json`. Read the schema file first to ensure all required fields are present.
 
+**Create the skill workspace** if this is a new skill:
+1. Derive the skill slug from the target skill name (lowercase, hyphenated)
+2. Create the directory `learn-anything/<skill-slug>/`
+3. Write or update `learn-anything/active-skill.json` with `{"active": "<skill-slug>"}`
+
+Save the JSON to `learn-anything/<skill-slug>/domain-assessment.json`.
+
 Present a conversational summary to the learner covering:
 1. How you've classified their skill and what that means for the approach
 2. Their short-term plan (specific, energizing)
 3. Their extended roadmap if applicable
 4. The identity frame
 5. What happens next (the Skill Researcher will do a deep dive)
-
-Save the JSON to `domain-assessment.json` in the project.
 
 ## Key Rules
 
