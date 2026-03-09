@@ -1,0 +1,133 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "SkillDossier",
+  "description": "Skill research output: component inventory, dependency graph, frequency analysis, transfer pathways, failure points. Graph structure mirrors Apache AGE vertex/edge model.",
+  "type": "object",
+  "required": ["id", "assessment_id", "created_at", "target_skill", "graph", "frequency_analysis", "failure_points"],
+  "properties": {
+    "id": { "type": "string", "format": "uuid" },
+    "assessment_id": { "type": "string", "format": "uuid", "description": "FK to domain-assessment" },
+    "created_at": { "type": "string", "format": "date-time" },
+    "updated_at": { "type": "string", "format": "date-time" },
+    "target_skill": { "type": "string" },
+
+    "graph": {
+      "type": "object",
+      "required": ["vertices", "edges"],
+      "description": "Dependency graph in AGE-compatible vertex/edge format",
+      "properties": {
+        "vertices": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["id", "label", "name", "description", "blooms_level", "component_type", "confidence"],
+            "properties": {
+              "id": { "type": "string", "description": "Unique vertex ID, used as canonical reference across all schemas" },
+              "label": { "type": "string", "enum": ["Concept", "Skill"], "description": "AGE vertex label" },
+              "name": { "type": "string", "description": "Short human-readable name" },
+              "description": { "type": "string", "description": "What this component covers" },
+              "blooms_level": { "type": "string", "enum": ["remember", "understand", "apply", "analyze", "evaluate", "create"] },
+              "component_type": { "type": "string", "enum": ["recurrent", "non_recurrent"], "description": "4C/ID classification: recurrent = automate via drill, non-recurrent = schema building" },
+              "cognitive_load_type": { "type": "string", "enum": ["intrinsic", "extraneous", "germane"] },
+              "frequency_score": { "type": "number", "minimum": 0, "maximum": 1, "description": "How frequently this component is used in practice (1 = always)" },
+              "impact_score": { "type": "number", "minimum": 0, "maximum": 1, "description": "How much mastering this component contributes to overall competence" },
+              "confidence": { "type": "string", "enum": ["high", "medium", "low"], "description": "System confidence in this decomposition" },
+              "verification_needed": { "type": "string", "description": "If confidence is low, what specifically needs expert validation" },
+              "embedding": { "type": "array", "items": { "type": "number" }, "description": "Semantic embedding vector for pgvector similarity search" },
+              "cluster_id": { "type": "string", "description": "Natural cluster grouping for modular visualization" },
+              "assessment_criteria": { "type": "string", "description": "How to assess mastery of this component" },
+              "example": { "type": "string", "description": "Concrete real-world example demonstrating this component" }
+            }
+          }
+        },
+        "edges": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["from_id", "to_id", "label"],
+            "properties": {
+              "from_id": { "type": "string", "description": "Source vertex ID" },
+              "to_id": { "type": "string", "description": "Target vertex ID" },
+              "label": {
+                "type": "string",
+                "enum": ["PREREQUISITE", "RELATED", "REINFORCEMENT"],
+                "description": "Edge type: PREREQUISITE (directed, from prereq to dependent), RELATED (similarity), REINFORCEMENT (practicing A strengthens B)"
+              },
+              "strength": { "type": "number", "minimum": 0, "maximum": 1, "description": "Edge weight / strength" },
+              "prerequisite_type": { "type": "string", "enum": ["hard", "soft"], "description": "For PREREQUISITE edges: hard = must learn first, soft = helps but not required" },
+              "transfer_coefficient": { "type": "number", "minimum": 0, "maximum": 1, "description": "For RELATED edges: degree to which mastery transfers between these components" }
+            }
+          }
+        }
+      }
+    },
+
+    "frequency_analysis": {
+      "type": "object",
+      "properties": {
+        "distribution_type": { "type": "string", "description": "e.g. '80/20', '90/10', '70/30'" },
+        "coverage_thresholds": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "component_percentage": { "type": "number" },
+              "competence_coverage": { "type": "number" }
+            }
+          },
+          "description": "e.g. [{component_percentage: 20, competence_coverage: 80}]"
+        },
+        "gateway_nodes": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Vertex IDs with highest betweenness centrality — unlock the most downstream learning"
+        },
+        "analysis_notes": { "type": "string" }
+      }
+    },
+
+    "transfer_pathways": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["source_domain", "target_vertex_id", "similarity_score", "transfer_type"],
+        "properties": {
+          "source_domain": { "type": "string", "description": "Learner's existing skill domain" },
+          "target_vertex_id": { "type": "string", "description": "Skill graph vertex that may benefit from transfer" },
+          "similarity_score": { "type": "number", "minimum": 0, "maximum": 1 },
+          "transfer_type": { "type": "string", "enum": ["near", "moderate", "far", "negative_risk"] },
+          "description": { "type": "string" },
+          "recommended_action": { "type": "string", "enum": ["auto_boost", "accelerated_path", "probe_first", "contrast_instruction"] }
+        }
+      }
+    },
+
+    "failure_points": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["type", "description"],
+        "properties": {
+          "type": { "type": "string", "enum": ["beginner_mistake", "plateau", "strategy_transition", "illusion_of_competence"] },
+          "description": { "type": "string" },
+          "typical_timing": { "type": "string", "description": "When this typically occurs, e.g. 'week 3-4'" },
+          "affected_vertices": { "type": "array", "items": { "type": "string" }, "description": "Vertex IDs affected" },
+          "mitigation": { "type": "string" }
+        }
+      }
+    },
+
+    "research_sources": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "type": { "type": "string", "enum": ["expert_interview", "curriculum", "textbook", "research_paper", "course", "web_resource"] },
+          "title": { "type": "string" },
+          "url": { "type": "string" },
+          "notes": { "type": "string" }
+        }
+      }
+    }
+  }
+}

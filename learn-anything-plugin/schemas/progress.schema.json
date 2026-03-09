@@ -1,0 +1,142 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Progress",
+  "description": "Learner progress state: session history, mastery transitions, conductor state. Written by the Training Conductor after each session. Read by Conductor at session start and by Dashboard for visualization.",
+  "type": "object",
+  "required": ["learner_id", "plan_id", "current_state", "sessions"],
+  "properties": {
+    "learner_id": { "type": "string", "format": "uuid" },
+    "plan_id": { "type": "string", "format": "uuid" },
+    "updated_at": { "type": "string", "format": "date-time" },
+
+    "current_state": {
+      "type": "object",
+      "required": ["curriculum_position", "total_sessions_completed"],
+      "properties": {
+        "curriculum_position": {
+          "type": "object",
+          "properties": {
+            "current_task_class_id": { "type": "string" },
+            "current_task_sequence": { "type": "integer" },
+            "task_class_name": { "type": "string" }
+          }
+        },
+        "total_sessions_completed": { "type": "integer" },
+        "total_practice_minutes": { "type": "integer" },
+        "next_session_agenda": {
+          "type": "object",
+          "properties": {
+            "template": { "type": "string", "enum": ["A_concept_intro", "B_retrieval_review", "C_skill_drill", "D_productive_failure", "E_mastery_gate"] },
+            "focus_vertex_ids": { "type": "array", "items": { "type": "string" } },
+            "retrieval_probe_vertex_ids": { "type": "array", "items": { "type": "string" }, "description": "Vertices due for delayed retrieval probes" },
+            "notes": { "type": "string" }
+          }
+        },
+        "motivation_state": {
+          "type": "object",
+          "properties": {
+            "engagement_trend": { "type": "string", "enum": ["increasing", "stable", "declining"] },
+            "plateau_status": { "type": "string", "enum": ["none", "approaching", "active", "resolving"] },
+            "sessions_since_plateau_start": { "type": "integer" },
+            "current_identity_reinforcement": { "type": "string" }
+          }
+        },
+        "difficulty_calibration": {
+          "type": "object",
+          "properties": {
+            "current_zone": { "type": "string", "enum": ["below_zpd", "struggling_productively", "zpd_optimal", "mastery", "bored"] },
+            "rolling_accuracy": { "type": "number", "description": "Accuracy over last 5 substantive questions" },
+            "scaffold_level": { "type": "integer", "minimum": 1, "maximum": 4, "description": "Current scaffolding level (1=open-ended, 4=direct)" }
+          }
+        }
+      }
+    },
+
+    "sessions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["session_id", "date", "template_used", "topics"],
+        "properties": {
+          "session_id": { "type": "string", "format": "uuid" },
+          "date": { "type": "string", "format": "date-time" },
+          "duration_minutes": { "type": "integer" },
+          "template_used": { "type": "string" },
+          "topics": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "vertex_id": { "type": "string" },
+                "activity_type": { "type": "string", "enum": ["introduction", "practice", "review", "assessment", "productive_failure"] },
+                "performance": {
+                  "type": "object",
+                  "properties": {
+                    "accuracy": { "type": "number" },
+                    "scaffold_level_needed": { "type": "integer" },
+                    "bloom_level_demonstrated": { "type": "string" },
+                    "notes": { "type": "string" }
+                  }
+                }
+              }
+            }
+          },
+          "retrieval_probe_results": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "vertex_id": { "type": "string" },
+                "card_id": { "type": "string", "description": "Corresponding SRS card ID if applicable" },
+                "days_since_last_review": { "type": "number" },
+                "result": { "type": "string", "enum": ["correct", "partial", "incorrect"] },
+                "confidence_pre": { "type": "integer", "minimum": 1, "maximum": 5 }
+              }
+            }
+          },
+          "mastery_transitions": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": ["vertex_id", "from_state", "to_state", "trigger"],
+              "properties": {
+                "vertex_id": { "type": "string" },
+                "from_state": { "type": "string" },
+                "to_state": { "type": "string" },
+                "trigger": { "type": "string", "enum": ["assessment", "retrieval_probe", "practice_performance", "mastery_gate", "decay"] },
+                "evidence": { "type": "string" }
+              }
+            }
+          },
+          "difficulty_observations": {
+            "type": "object",
+            "properties": {
+              "zone_at_start": { "type": "string" },
+              "zone_at_end": { "type": "string" },
+              "adjustments_made": { "type": "array", "items": { "type": "string" } }
+            }
+          },
+          "session_summary": { "type": "string", "description": "Compressed natural language summary for context in future sessions" }
+        }
+      }
+    },
+
+    "mastery_transition_log": {
+      "type": "array",
+      "description": "Complete audit trail of all mastery state changes across all sessions and imports",
+      "items": {
+        "type": "object",
+        "required": ["vertex_id", "from_state", "to_state", "trigger_type", "timestamp"],
+        "properties": {
+          "vertex_id": { "type": "string" },
+          "from_state": { "type": "string" },
+          "to_state": { "type": "string" },
+          "trigger_type": { "type": "string", "enum": ["assessment", "conductor", "decay", "anki_import", "self_report", "propagation", "calibration"] },
+          "trigger_source_id": { "type": "string", "description": "Session ID or import ID that triggered the change" },
+          "reason": { "type": "string" },
+          "timestamp": { "type": "string", "format": "date-time" }
+        }
+      }
+    }
+  }
+}

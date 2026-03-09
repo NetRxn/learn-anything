@@ -1,0 +1,160 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "KnowledgeGraph",
+  "description": "The dual-layer knowledge graph: skill dependency graph (from Researcher) overlaid with learner mastery state (from Calibrator, updated by Conductor and imports). Central artifact of the entire system.",
+  "type": "object",
+  "required": ["id", "dossier_id", "learner_id", "created_at", "graph", "gap_analysis"],
+  "properties": {
+    "id": { "type": "string", "format": "uuid" },
+    "dossier_id": { "type": "string", "format": "uuid", "description": "FK to skill-dossier" },
+    "learner_id": { "type": "string", "format": "uuid" },
+    "created_at": { "type": "string", "format": "date-time" },
+    "updated_at": { "type": "string", "format": "date-time" },
+
+    "graph": {
+      "type": "object",
+      "required": ["vertices", "edges"],
+      "description": "Full graph with learner overlay applied to vertices. Edges from dossier; vertices gain learner_state properties.",
+      "properties": {
+        "vertices": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["id", "label", "name", "learner_state"],
+            "properties": {
+              "id": { "type": "string" },
+              "label": { "type": "string", "enum": ["Concept", "Skill"] },
+              "name": { "type": "string" },
+              "description": { "type": "string" },
+              "blooms_level": { "type": "string" },
+              "component_type": { "type": "string", "enum": ["recurrent", "non_recurrent"] },
+              "frequency_score": { "type": "number" },
+              "impact_score": { "type": "number" },
+              "cluster_id": { "type": "string" },
+
+              "learner_state": {
+                "type": "object",
+                "required": ["mastery_probability", "mastery_category", "confidence"],
+                "description": "Per-learner overlay. Updated by Calibrator, Conductor, and imports.",
+                "properties": {
+                  "mastery_probability": {
+                    "type": "number", "minimum": 0, "maximum": 1,
+                    "description": "Continuous mastery estimate (primary measure)"
+                  },
+                  "mastery_category": {
+                    "type": "string",
+                    "enum": ["not_started", "attempted", "familiar", "proficient", "mastered"],
+                    "description": "Derived: not_started(<0.10), attempted(0.10-0.39), familiar(0.40-0.69), proficient(0.70-0.89), mastered(>=0.90)"
+                  },
+                  "confidence": {
+                    "type": "number", "minimum": 0, "maximum": 1,
+                    "description": "System confidence in this mastery estimate"
+                  },
+                  "evidence_count": { "type": "integer", "default": 0 },
+                  "last_assessed": { "type": "string", "format": "date-time" },
+                  "evidence_summary": { "type": "string", "description": "Brief summary of assessment evidence" },
+
+                  "fsrs_difficulty": {
+                    "type": "number", "minimum": 1, "maximum": 10,
+                    "description": "FSRS difficulty parameter (inherent complexity)"
+                  },
+                  "fsrs_stability": {
+                    "type": "number", "minimum": 0,
+                    "description": "FSRS stability in days (time for retrievability to decay from 100% to 90%)"
+                  },
+
+                  "bkt_p_transit": {
+                    "type": "number", "minimum": 0, "maximum": 1, "default": 0.15,
+                    "description": "BKT: probability of learning on each opportunity"
+                  },
+                  "bkt_p_slip": {
+                    "type": "number", "minimum": 0, "maximum": 1, "default": 0.08,
+                    "description": "BKT: probability of error despite mastery"
+                  },
+                  "bkt_p_guess": {
+                    "type": "number", "minimum": 0, "maximum": 1, "default": 0.12,
+                    "description": "BKT: probability of correct response despite non-mastery"
+                  },
+
+                  "transfer_boost": {
+                    "type": "number", "minimum": 0, "maximum": 1, "default": 0,
+                    "description": "Mastery attributed to transfer from related skills"
+                  },
+                  "source": {
+                    "type": "string",
+                    "enum": ["calibration", "assessment", "conductor", "anki_import", "self_report", "propagation", "cluster_inference"],
+                    "description": "How this state was most recently determined"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "edges": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["from_id", "to_id", "label"],
+            "properties": {
+              "from_id": { "type": "string" },
+              "to_id": { "type": "string" },
+              "label": { "type": "string", "enum": ["PREREQUISITE", "RELATED", "REINFORCEMENT"] },
+              "strength": { "type": "number" },
+              "prerequisite_type": { "type": "string", "enum": ["hard", "soft"] },
+              "transfer_coefficient": { "type": "number" }
+            }
+          }
+        }
+      }
+    },
+
+    "gap_analysis": {
+      "type": "object",
+      "required": ["total_vertices", "coverage_summary", "priority_gaps", "effective_scope_estimate"],
+      "properties": {
+        "total_vertices": { "type": "integer" },
+        "coverage_summary": {
+          "type": "object",
+          "properties": {
+            "mastered": { "type": "integer" },
+            "proficient": { "type": "integer" },
+            "familiar": { "type": "integer" },
+            "attempted": { "type": "integer" },
+            "not_started": { "type": "integer" },
+            "coverage_percentage": { "type": "number", "description": "Weighted coverage: sum(mastery_probability * impact_score) / sum(impact_score)" }
+          }
+        },
+        "priority_gaps": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "vertex_id": { "type": "string" },
+              "name": { "type": "string" },
+              "priority_score": { "type": "number", "description": "frequency * centrality * impact * (1 - mastery) * transfer_leverage" },
+              "rationale": { "type": "string" }
+            }
+          },
+          "description": "Unfilled nodes ranked by priority for curriculum inclusion"
+        },
+        "transfer_leverage": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "vertex_id": { "type": "string" },
+              "source_skill": { "type": "string" },
+              "transfer_type": { "type": "string" },
+              "scaffold_description": { "type": "string" }
+            }
+          },
+          "description": "Transfer pathways that accelerate curriculum"
+        },
+        "effective_scope_estimate": {
+          "type": "string",
+          "description": "Human-readable estimate of remaining curriculum scope, accounting for existing knowledge"
+        }
+      }
+    }
+  }
+}

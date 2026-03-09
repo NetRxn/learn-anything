@@ -1,0 +1,153 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "ExternalImport",
+  "description": "External data imports from Anki, Obsidian, self-reports, and other tools. Processed by the Training Conductor at session start to update the knowledge graph overlay.",
+  "type": "object",
+  "required": ["id", "learner_id", "source", "imported_at", "data"],
+  "properties": {
+    "id": { "type": "string", "format": "uuid" },
+    "learner_id": { "type": "string", "format": "uuid" },
+    "source": {
+      "type": "string",
+      "enum": ["anki", "obsidian", "self_report", "other"],
+      "description": "Data source type"
+    },
+    "imported_at": { "type": "string", "format": "date-time" },
+    "processed": { "type": "boolean", "default": false },
+    "processed_at": { "type": "string", "format": "date-time" },
+
+    "data": {
+      "oneOf": [
+        {
+          "type": "object",
+          "description": "Anki review history import",
+          "required": ["import_type", "reviews"],
+          "properties": {
+            "import_type": { "const": "anki_reviews" },
+            "reviews": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "required": ["card_id", "review_timestamp", "ease", "interval_days"],
+                "properties": {
+                  "card_id": { "type": "string", "format": "uuid", "description": "Maps to srs_cards.card_id" },
+                  "component_id": { "type": "string", "description": "AGE vertex ref, recovered from Anki note's KnowledgeNodeID field" },
+                  "review_timestamp": { "type": "string", "format": "date-time" },
+                  "ease": {
+                    "type": "integer", "minimum": 1, "maximum": 4,
+                    "description": "Anki ease rating: 1=Again, 2=Hard, 3=Good, 4=Easy"
+                  },
+                  "interval_days": { "type": "number", "description": "New interval assigned by Anki. Negative = seconds for learning steps." },
+                  "previous_interval_days": { "type": "number" },
+                  "ease_factor": { "type": "number", "description": "Anki ease factor in decimal (e.g. 2.50)" },
+                  "review_duration_ms": { "type": "integer" },
+                  "review_type": {
+                    "type": "integer",
+                    "enum": [0, 1, 2, 3],
+                    "description": "0=learn, 1=review, 2=relearn, 3=filtered"
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "type": "object",
+          "description": "Self-report of practice or real-world application",
+          "required": ["import_type", "reports"],
+          "properties": {
+            "import_type": { "const": "self_report" },
+            "reports": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "required": ["timestamp", "activity_type"],
+                "properties": {
+                  "timestamp": { "type": "string", "format": "date-time" },
+                  "component_id": { "type": "string", "description": "AGE vertex ref if known" },
+                  "component_description": { "type": "string", "description": "Free text if component_id not known — matched via pgvector" },
+                  "activity_type": {
+                    "type": "string",
+                    "enum": ["practice", "observation", "application", "reflection", "teaching_others"]
+                  },
+                  "duration_minutes": { "type": "integer" },
+                  "self_assessed_quality": {
+                    "type": "integer", "minimum": 1, "maximum": 5,
+                    "description": "1=poor, 5=excellent"
+                  },
+                  "observations": { "type": "string", "description": "Free text: what happened, what worked, what didn't" },
+                  "outcome": { "type": "string", "description": "Free text: specific result or achievement" }
+                }
+              }
+            }
+          }
+        },
+        {
+          "type": "object",
+          "description": "Obsidian or other unstructured notes import",
+          "required": ["import_type", "notes"],
+          "properties": {
+            "import_type": { "const": "notes" },
+            "notes": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "required": ["content"],
+                "properties": {
+                  "title": { "type": "string" },
+                  "content": { "type": "string", "description": "Full note text. Wikilinks [[like this]] are matched to graph nodes with high confidence." },
+                  "tags": { "type": "array", "items": { "type": "string" } },
+                  "created_at": { "type": "string", "format": "date-time" },
+                  "source_path": { "type": "string", "description": "Original file path in Obsidian/filesystem" }
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+
+    "processing_results": {
+      "type": "object",
+      "description": "Filled in after processing. Maps external data to knowledge graph updates.",
+      "properties": {
+        "mastery_deltas": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "vertex_id": { "type": "string" },
+              "delta": { "type": "number", "description": "Change to mastery_probability (positive or negative)" },
+              "confidence": { "type": "number" },
+              "source_weight": { "type": "number", "description": "Weight applied based on source type and recency" },
+              "reasoning": { "type": "string" }
+            }
+          }
+        },
+        "conflicts_detected": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "vertex_id": { "type": "string" },
+              "conflict_type": { "type": "string", "enum": ["recognition_vs_application", "card_quality_issue", "self_report_vs_behavioral"] },
+              "description": { "type": "string" },
+              "resolution": { "type": "string" }
+            }
+          }
+        },
+        "unmatched_items": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "description": { "type": "string" },
+              "reason": { "type": "string" }
+            }
+          },
+          "description": "Import items that couldn't be matched to graph nodes"
+        }
+      }
+    }
+  }
+}

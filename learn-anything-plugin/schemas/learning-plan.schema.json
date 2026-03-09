@@ -1,0 +1,235 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "LearningPlan",
+  "description": "Complete learning plan: sequenced curriculum with task classes, dual-timeline schedule, motivation architecture, assessment criteria, and plateau protocols.",
+  "type": "object",
+  "required": ["id", "knowledge_graph_id", "learner_id", "created_at", "curriculum", "schedule", "motivation_architecture"],
+  "properties": {
+    "id": { "type": "string", "format": "uuid" },
+    "knowledge_graph_id": { "type": "string", "format": "uuid" },
+    "learner_id": { "type": "string", "format": "uuid" },
+    "created_at": { "type": "string", "format": "date-time" },
+    "updated_at": { "type": "string", "format": "date-time" },
+
+    "curriculum": {
+      "type": "object",
+      "required": ["epitome", "task_classes", "selected_vertices"],
+      "properties": {
+        "epitome": {
+          "type": "object",
+          "required": ["description", "vertex_ids"],
+          "properties": {
+            "description": { "type": "string", "description": "The simplest complete representative task — lesson one. Reigeluth Elaboration Theory." },
+            "vertex_ids": { "type": "array", "items": { "type": "string" } },
+            "leverages_existing_knowledge": { "type": "string", "description": "How the epitome uses the learner's prior experience" }
+          }
+        },
+
+        "task_classes": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["id", "name", "complexity_level", "vertex_ids", "tasks"],
+            "properties": {
+              "id": { "type": "string" },
+              "name": { "type": "string" },
+              "complexity_level": { "type": "integer", "minimum": 1, "description": "1 = simplest, increases with complexity" },
+              "description": { "type": "string" },
+              "vertex_ids": {
+                "type": "array", "items": { "type": "string" },
+                "description": "Knowledge graph vertices covered by this task class"
+              },
+              "tasks": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "required": ["sequence", "support_level", "task_type"],
+                  "properties": {
+                    "sequence": { "type": "integer" },
+                    "support_level": {
+                      "type": "string",
+                      "enum": ["worked_example", "completion", "guided", "conventional", "independent"],
+                      "description": "4C/ID support fading: worked -> completion -> conventional within each class"
+                    },
+                    "task_type": { "type": "string", "enum": ["whole_task", "part_task_drill", "productive_failure"] },
+                    "description": { "type": "string" },
+                    "vertex_ids": { "type": "array", "items": { "type": "string" } },
+                    "session_template": {
+                      "type": "string",
+                      "enum": ["A_concept_intro", "B_retrieval_review", "C_skill_drill", "D_productive_failure", "E_mastery_gate"],
+                      "description": "Which Training Conductor session template to use"
+                    }
+                  }
+                }
+              },
+              "mastery_gate": {
+                "type": "object",
+                "properties": {
+                  "criteria": { "type": "string", "description": "What the learner must demonstrate to advance" },
+                  "assessment_vertex_ids": { "type": "array", "items": { "type": "string" } },
+                  "bloom_level_required": { "type": "string" },
+                  "passing_threshold": { "type": "number" },
+                  "min_items": { "type": "integer" }
+                }
+              },
+              "productive_failure_points": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "vertex_id": { "type": "string" },
+                    "rationale": { "type": "string", "description": "Why this concept benefits from struggle-first" },
+                    "naive_theory": { "type": "string", "description": "Common misconception to surface and address" }
+                  }
+                }
+              },
+              "interleaving_pool": {
+                "type": "array", "items": { "type": "string" },
+                "description": "Vertex IDs from earlier task classes to interleave into practice"
+              }
+            }
+          }
+        },
+
+        "selected_vertices": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["vertex_id", "priority_rank", "rationale"],
+            "properties": {
+              "vertex_id": { "type": "string" },
+              "priority_rank": { "type": "integer" },
+              "selection_score": { "type": "number" },
+              "rationale": { "type": "string" },
+              "excluded": { "type": "boolean", "default": false },
+              "exclusion_reason": { "type": "string" }
+            }
+          },
+          "description": "All vertices considered for inclusion, ranked by selection score"
+        }
+      }
+    },
+
+    "schedule": {
+      "type": "object",
+      "required": ["short_term_plan", "session_design"],
+      "properties": {
+        "short_term_plan": {
+          "type": "object",
+          "required": ["timeframe", "sessions_per_week", "session_duration_minutes", "total_sessions"],
+          "properties": {
+            "timeframe": { "type": "string" },
+            "start_date": { "type": "string", "format": "date" },
+            "target_end_date": { "type": "string", "format": "date" },
+            "sessions_per_week": { "type": "integer" },
+            "session_duration_minutes": { "type": "integer" },
+            "total_sessions": { "type": "integer" },
+            "milestones": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "week": { "type": "integer" },
+                  "description": { "type": "string" },
+                  "task_class_id": { "type": "string" },
+                  "expected_coverage": { "type": "number" }
+                }
+              }
+            }
+          }
+        },
+        "extended_roadmap": {
+          "type": "object",
+          "properties": {
+            "description": { "type": "string" },
+            "phases": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "phase_name": { "type": "string" },
+                  "timeframe": { "type": "string" },
+                  "focus": { "type": "string" },
+                  "target_coverage": { "type": "number" }
+                }
+              }
+            }
+          }
+        },
+        "session_design": {
+          "type": "object",
+          "properties": {
+            "warmup_minutes": { "type": "integer" },
+            "deliberate_practice_minutes": { "type": "integer" },
+            "integration_minutes": { "type": "integer" },
+            "spacing_interval_days": { "type": "number", "description": "Optimal spacing between sessions for this retention target" },
+            "overlearning_budget_minutes": { "type": "integer", "description": "Extra practice beyond mastery for hyper-stabilization" }
+          }
+        },
+        "plateau_protocols": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "expected_timing": { "type": "string" },
+              "description": { "type": "string" },
+              "breakthrough_strategy": { "type": "string" },
+              "affected_task_class": { "type": "string" }
+            }
+          }
+        },
+        "srs_export_schedule": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "task_class_id": { "type": "string" },
+              "export_timing": { "type": "string", "description": "When to generate Anki deck for this task class" },
+              "card_count_estimate": { "type": "integer" }
+            }
+          }
+        }
+      }
+    },
+
+    "motivation_architecture": {
+      "type": "object",
+      "properties": {
+        "identity_frame": { "type": "string" },
+        "process_goals": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Daily process-focused goals (not outcome-focused)"
+        },
+        "competence_markers": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "description": { "type": "string" },
+              "vertex_ids": { "type": "array", "items": { "type": "string" } },
+              "timing": { "type": "string" }
+            }
+          },
+          "description": "Visible progress milestones tied to real retention"
+        },
+        "community_resources": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "name": { "type": "string" },
+              "type": { "type": "string" },
+              "url": { "type": "string" },
+              "description": { "type": "string" }
+            }
+          }
+        },
+        "stakes_plan": {
+          "type": "string",
+          "description": "If applicable: autonomy-supportive external accountability for low-intrinsic-interest tasks only"
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,137 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "DomainAssessment",
+  "description": "Skill classification and initial learner profile produced by the Domain Assessor",
+  "type": "object",
+  "required": ["id", "created_at", "skill_classification", "learner_profile", "approach_strategy", "identity_frame"],
+  "properties": {
+    "id": { "type": "string", "format": "uuid" },
+    "created_at": { "type": "string", "format": "date-time" },
+    "updated_at": { "type": "string", "format": "date-time" },
+
+    "skill_classification": {
+      "type": "object",
+      "required": ["target_skill", "skill_type", "environment_type", "blooms_ceiling", "modularity", "tacit_knowledge_ratio"],
+      "properties": {
+        "target_skill": { "type": "string", "description": "The skill the user wants to learn, in their own words" },
+        "skill_type": {
+          "type": "string",
+          "enum": ["motor", "cognitive_lower", "cognitive_higher", "perceptual", "social", "hybrid"],
+          "description": "Primary skill type classification"
+        },
+        "skill_type_secondary": {
+          "type": "array",
+          "items": { "type": "string", "enum": ["motor", "cognitive_lower", "cognitive_higher", "perceptual", "social"] },
+          "description": "Secondary skill types for hybrid skills"
+        },
+        "environment_type": {
+          "type": "string",
+          "enum": ["kind", "mostly_kind", "mixed", "mostly_wicked", "wicked"],
+          "description": "Hogarth learning environment classification"
+        },
+        "blooms_ceiling": {
+          "type": "string",
+          "enum": ["remember", "understand", "apply", "analyze", "evaluate", "create"],
+          "description": "Highest Bloom's level required for the user's stated goal"
+        },
+        "modularity": {
+          "type": "string",
+          "enum": ["highly_modular", "moderately_modular", "weakly_modular", "emergent"],
+          "description": "How decomposable the skill is into independent sub-skills"
+        },
+        "tacit_knowledge_ratio": {
+          "type": "string",
+          "enum": ["low", "moderate", "high", "very_high"],
+          "description": "How much expertise is implicit vs. articulable"
+        },
+        "classification_confidence": {
+          "type": "string",
+          "enum": ["high", "medium", "low"]
+        },
+        "classification_notes": { "type": "string" }
+      }
+    },
+
+    "learner_profile": {
+      "type": "object",
+      "required": ["related_experience", "constraints", "purpose"],
+      "properties": {
+        "related_experience": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["domain", "level", "description"],
+            "properties": {
+              "domain": { "type": "string" },
+              "level": { "type": "string", "enum": ["none", "beginner", "intermediate", "advanced", "expert"] },
+              "description": { "type": "string" },
+              "transfer_potential": { "type": "string", "enum": ["high", "moderate", "low", "unknown"] }
+            }
+          },
+          "description": "Related skills and domains the learner has experience in"
+        },
+        "frameworks_and_vocabulary": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Mental models, frameworks, or domain vocabulary the learner already carries"
+        },
+        "learning_experience": {
+          "type": "string",
+          "enum": ["novice_learner", "some_experience", "experienced_self_directed", "expert_learner"],
+          "description": "General self-directed learning experience level"
+        },
+        "constraints": {
+          "type": "object",
+          "properties": {
+            "time_per_day_minutes": { "type": "integer" },
+            "days_per_week": { "type": "integer" },
+            "total_timeframe": { "type": "string", "description": "User's stated timeframe, e.g. '6 weeks', '3 months'" },
+            "equipment_access": { "type": "string" },
+            "environment_notes": { "type": "string" }
+          }
+        },
+        "purpose": { "type": "string", "description": "Why the learner wants this skill — deeper motivation" },
+        "desired_competence_level": {
+          "type": "string",
+          "enum": ["functional_basics", "competent_practitioner", "advanced_practitioner", "expert"],
+          "description": "User's target level of competence"
+        }
+      }
+    },
+
+    "approach_strategy": {
+      "type": "object",
+      "required": ["instructional_approach", "short_term_plan_summary", "extended_roadmap_summary"],
+      "properties": {
+        "instructional_approach": {
+          "type": "string",
+          "enum": ["standard_disss", "whole_task_4cid", "categorical_framework", "observation_practice_debrief", "hybrid"],
+          "description": "Primary instructional methodology"
+        },
+        "approach_rationale": { "type": "string" },
+        "short_term_plan_summary": {
+          "type": "string",
+          "description": "What's achievable within the stated timeframe — specific and constructive"
+        },
+        "extended_roadmap_summary": {
+          "type": "string",
+          "description": "The continued path beyond the initial timeframe, if the goal requires more time"
+        },
+        "domain_specific_adaptations": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Specific adaptations needed for this skill type"
+        }
+      }
+    },
+
+    "identity_frame": {
+      "type": "object",
+      "required": ["identity_statement", "purpose_connection"],
+      "properties": {
+        "identity_statement": { "type": "string", "description": "e.g. 'You are becoming a guitarist'" },
+        "purpose_connection": { "type": "string", "description": "How the identity connects to the learner's stated purpose" }
+      }
+    }
+  }
+}
