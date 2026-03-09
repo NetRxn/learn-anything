@@ -86,23 +86,31 @@ pip install -r requirements.txt
 
 ## Installation
 
+### From a local path (for development or testing)
+
+```bash
+# from command line run
+claude plugin marketplace add /path/to/learn-anything
+```
+
+```bash
+# Not validated
+# In Claude Code, run:
+/plugin marketplace add /path/to/learn-anything
+```
+
 ### From the marketplace
 
 If this plugin is published to a GitHub-based marketplace:
 
 ```bash
+# Not validated
 # In Claude Code, run:
 /plugin marketplace add NetRxn/learn-anything
 ```
 
 Then enable the plugin when prompted. All 8 skills are auto-discovered from the `skills/` directory.
 
-### From a local path (for development or testing)
-
-```bash
-# In Claude Code, run:
-/plugin marketplace add /path/to/learn-anything
-```
 
 ### Verify installation
 

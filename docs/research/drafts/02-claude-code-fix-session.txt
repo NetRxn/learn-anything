@@ -1,0 +1,1074 @@
+After output of claude desktop conversation, claude code was used, exact conversation copied & pasted here for reference:
+
+
+
+❯ please start by deeply exploring ~/Programming/Infrastructure/Plugin-Library/learn-anything/docs; after which, please
+use /plugin-dev to validate the implementation:
+~/Programming/Infrastructure/Plugin-Library/learn-anything/learn-anything-plugin (both for content & for structure).
+
+⏺ Let me start by deeply exploring the docs directory and the plugin structure in parallel.
+
+⏺ Explore(Deep explore plugin directory)
+  ⎿  Done (29 tool uses · 89.6k tokens · 2m 14s)
+  (ctrl+o to expand)
+
+⏺ Both directories thoroughly explored. Now let me check for the critical plugin manifest file and then validate.
+
+⏺ Searched for 2 patterns (ctrl+o to expand)
+
+⏺ Now I have a complete picture. Key finding: no plugin.json manifest exists. Let me invoke the plugin validation skill.
+
+⏺ Skill(plugin-dev:plugin-structure)
+  ⎿  Successfully loaded skill
+
+⏺ Good, I now have the full plugin structure requirements. Let me check the SKILL.md frontmatter for proper format.
+
+⏺ Read 4 files (ctrl+o to expand)
+
+⏺ Now let me run the formal plugin validation.
+
+⏺ plugin-dev:plugin-validator(Validate plugin structure)
+  ⎿  Done (35 tool uses · 74.1k tokens · 3m 1s)
+  (ctrl+o to expand)
+
+⏺ Validation Report: learn-anything-plugin
+
+  Verdict: FAIL (structure) / EXCELLENT (content)
+
+  The content quality is exceptional — pedagogically grounded, operationally precise, and architecturally coherent. But two critical
+  structural issues prevent Claude Code from discovering it as a plugin.
+
+  ---
+  Critical Issues (must fix)
+
+  ┌─────┬──────────────────────────────────────────────────────────────┬─────────────────────────────────────────────────────────────┐
+  │  #  │                            Issue                             │                             Fix                             │
+  ├─────┼──────────────────────────────────────────────────────────────┼─────────────────────────────────────────────────────────────┤
+  │ 1   │ No .claude-plugin/plugin.json — plugin is invisible to       │ Create .claude-plugin/plugin.json with name, version,       │
+  │     │ Claude Code                                                  │ description                                                 │
+  ├─────┼──────────────────────────────────────────────────────────────┼─────────────────────────────────────────────────────────────┤
+  │ 2   │ Skills at root instead of skills/ — none of the 8 skills     │ Move all 8 skill dirs into skills/ (e.g. orchestrator/ →    │
+  │     │ will be auto-discovered                                      │ skills/orchestrator/)                                       │
+  └─────┴──────────────────────────────────────────────────────────────┴─────────────────────────────────────────────────────────────┘
+
+  Major Issues
+
+  ┌─────┬────────────────────────────────────────────────────────────────────────────────┬───────────────────────────────────────────┐
+  │  #  │                                     Issue                                      │                    Fix                    │
+  ├─────┼────────────────────────────────────────────────────────────────────────────────┼───────────────────────────────────────────┤
+  │ 3   │ No requirements.txt for generate_anki.py's genanki dependency                  │ Add requirements.txt                      │
+  ├─────┼────────────────────────────────────────────────────────────────────────────────┼───────────────────────────────────────────┤
+  │ 4   │ Duplicate session-templates.md (material-forge vs training-conductor) —        │ Consolidate to one location or            │
+  │     │ divergence risk                                                                │ cross-reference                           │
+  └─────┴────────────────────────────────────────────────────────────────────────────────┴───────────────────────────────────────────┘
+
+  Minor Issues
+
+  ┌─────┬──────────────────────────────────────────────────────────────────────────────────────────────────────┐
+  │  #  │                                                Issue                                                 │
+  ├─────┼──────────────────────────────────────────────────────────────────────────────────────────────────────┤
+  │ 5   │ Relative path references in SKILL.md files will break after restructuring — need audit               │
+  ├─────┼──────────────────────────────────────────────────────────────────────────────────────────────────────┤
+  │ 6   │ orchestrator/SKILL.md references component dirs by bare names — update to skill names                │
+  ├─────┼──────────────────────────────────────────────────────────────────────────────────────────────────────┤
+  │ 7   │ learning-plan.schema.json may have nesting issue (session_design inside short_term_plan vs schedule) │
+  ├─────┼──────────────────────────────────────────────────────────────────────────────────────────────────────┤
+  │ 8   │ No .gitignore for runtime state files (*.json, *.apkg, materials/, external-imports/)                │
+  ├─────┼──────────────────────────────────────────────────────────────────────────────────────────────────────┤
+  │ 9   │ Script path in material-forge/SKILL.md assumes CWD — should use plugin-root-relative path            │
+  └─────┴──────────────────────────────────────────────────────────────────────────────────────────────────────┘
+
+  Content Quality (all pass)
+
+  All 8 SKILL.md files have valid frontmatter (name + description), substantial trigger-oriented descriptions (374–594 chars), and
+  detailed executable instructions (90–200+ lines each). All 7 JSON schemas are valid Draft-07. The generate_anki.py script is
+  well-engineered with deterministic GUIDs and round-trip support.
+
+  Target Structure
+
+  learn-anything-plugin/
+  ├── .claude-plugin/
+  │   └── plugin.json              ← NEW (required)
+  ├── skills/                      ← NEW parent directory
+  │   ├── orchestrator/
+  │   │   └── SKILL.md
+  │   ├── domain-assessor/
+  │   │   └── SKILL.md
+  │   ├── skill-researcher/
+  │   │   ├── SKILL.md
+  │   │   └── references/
+  │   ├── learner-calibrator/
+  │   │   ├── SKILL.md
+  │   │   └── references/
+  │   ├── curriculum-architect/
+  │   │   ├── SKILL.md
+  │   │   └── references/
+  │   ├── material-forge/
+  │   │   ├── SKILL.md
+  │   │   ├── scripts/
+  │   │   └── references/
+  │   ├── training-conductor/
+  │   │   ├── SKILL.md
+  │   │   └── references/
+  │   └── dashboard-generator/
+  │       └── SKILL.md
+  ├── schemas/                     ← stays at root (shared)
+  ├── requirements.txt             ← NEW
+  └── .gitignore                   ← NEW
+
+  Want me to proceed with the structural fixes?
+
+✻ Worked for 5m 40s
+
+❯ yes, go ahead and fix all 9 issues - make sure to double-check the docs & related material for the session-templates.md duplication
+reasoning (i.e., intended to be the same thing or are the dual impelmentations supposed to be covering different features) if same,
+single source of truth preferred.
+
+⏺ Read 3 files (ctrl+o to expand)
+
+⏺ Good. The two session-templates.md files are identical in structure (same 5 templates A-E, same purpose) — the training-conductor
+  version is the full authoritative copy (116 lines with detailed dialogue examples), and the material-forge version is a condensed
+  abbreviation (105 lines). Single source of truth is correct here.
+
+  Now let me also verify the schema nesting concern and read the remaining SKILL.md files for path references before restructuring.
+
+⏺ Read 6 files (ctrl+o to expand)
+
+⏺ Good. Both session-templates.md files cover the identical 5 templates (A-E) for the identical purpose. The training-conductor version
+  (116 lines) is the full authoritative copy with detailed dialogue examples; the material-forge version (105 lines) is a condensed
+  abbreviation. Single source of truth is correct — keep the full version, cross-reference from material-forge.
+
+  Also confirmed: the learning-plan.schema.json nesting is correct — session_design and extended_roadmap are siblings of short_term_plan
+  under schedule.properties. Issue 7 is a false positive.
+
+  Now executing all fixes.
+
+⏺ Bash(cd ~/Programming/Infrastructure/Plugin-Library/learn-anything/learn-anything-plugin && mkdir -p .claude-plugin &&
+      mkdir -p skills)
+  ⎿  Done
+
+⏺ Write(learn-anything-plugin/.gitignore)
+  ⎿  Wrote 22 lines to learn-anything-plugin/.gitignore
+       1 # Runtime state files (generated per-learner, per-skill)
+       2 domain-assessment.json
+       3 skill-dossier.json
+       4 knowledge-graph.json
+       5 learning-plan.json
+       6 srs-cards.json
+       7 progress.json
+       8
+       9 # Generated outputs
+      10 *.apkg
+     … +12 lines (ctrl+o to expand)
+
+⏺ Now move all 8 skill directories into skills/ and remove the duplicate session-templates.md.
+
+⏺ Bash(mv orchestrator skills/ && mv domain-assessor skills/ && mv skill-researcher skills/ && mv learner-calibrator skills/ && mv
+      curriculum-architect skills/ && mv m…)
+  ⎿  Done
+
+⏺ Bash(rm ~/Programming/Infrastructure/Plugin-Library/learn-anything/learn-anything-plugin/skills/material-forge/reference
+      s/session-templates.md)
+  ⎿  Done
+
+⏺ Good. Now update all the SKILL.md files with corrected references. Let me do the edits in parallel.
+
+⏺ Update(learn-anything-plugin/skills/orchestrator/SKILL.md)
+  ⎿  File must be read first
+
+⏺ Update(learn-anything-plugin/skills/material-forge/SKILL.md)
+  ⎿  File must be read first
+
+⏺ Update(learn-anything-plugin/skills/material-forge/SKILL.md)
+  ⎿  File must be read first
+
+⏺ Need to re-read the files at their new locations after the move.
+
+⏺ Read 2 files (ctrl+o to expand)
+
+⏺ Now apply the edits.
+
+⏺ Update(learn-anything-plugin/skills/orchestrator/SKILL.md)
+  ⎿  Added 7 lines, removed 7 lines
+       9
+      10  ## System Components
+      11
+      12 -1. **Domain Assessor** (`domain-assessor/`) — Classifies skill, gathers learner profile, sets approach
+      13 -2. **Skill Researcher** (`skill-researcher/`) — Deep investigation, dependency graph construction
+      14 -3. **Learner Calibrator** (`learner-calibrator/`) — Diagnostic assessment, knowledge graph overlay
+      15 -4. **Curriculum Architect** (`curriculum-architect/`) — Learning plan design from gap analysis
+      16 -5. **Material Forge** (`material-forge/`) — Generates all learning materials and exports
+      17 -6. **Training Conductor** (`training-conductor/`) — Session-by-session teaching and assessment
+      18 -7. **Dashboard Generator** (`dashboard-generator/`) — Visual progress artifact
+      12 +1. **Domain Assessor** (skill: `domain-assessor`) — Classifies skill, gathers learner profile, sets approach
+      13 +2. **Skill Researcher** (skill: `skill-researcher`) — Deep investigation, dependency graph construction
+      14 +3. **Learner Calibrator** (skill: `learner-calibrator`) — Diagnostic assessment, knowledge graph overlay
+      15 +4. **Curriculum Architect** (skill: `curriculum-architect`) — Learning plan design from gap analysis
+      16 +5. **Material Forge** (skill: `material-forge`) — Generates all learning materials and exports
+      17 +6. **Training Conductor** (skill: `training-conductor`) — Session-by-session teaching and assessment
+      18 +7. **Dashboard Generator** (skill: `dashboard-generator`) — Visual progress artifact
+      19
+      20  ## State Files
+      21
+
+⏺ Update(learn-anything-plugin/skills/material-forge/SKILL.md)
+  ⎿  Added 1 line, removed 1 line
+      15  3. `schemas/srs-cards.schema.json` — Flashcard output format
+      16  4. `references/card-design-guide.md` — Card design principles and anti-patterns
+      17  5. `references/quality-rubrics.md` — Quality checks for all material types
+      18 -6. `references/session-templates.md` — Session templates (for designing template-aligned materials)
+      18 +6. `../training-conductor/references/session-templates.md` — Session templates (for designing template-aligned materials
+         +)
+      19
+      20  ## Generation Modes
+      21
+
+⏺ Update(learn-anything-plugin/skills/material-forge/SKILL.md)
+  ⎿  Added 1 line, removed 1 line
+      50  ```
+      51  Store in srs-cards.json and NEVER change these IDs.
+      52
+      53 -Write the complete card set to `srs-cards.json` conforming to the schema. Then run `scripts/generate_anki.py srs-cards.j
+         -son` to produce the .apkg file.
+      53 +Write the complete card set to `srs-cards.json` conforming to the schema. Then run the Anki export script at `scripts/ge
+         +nerate_anki.py` (located within this skill's directory) with `srs-cards.json` as input to produce the .apkg file.
+      54
+      55  ### 2. Worked Examples with Backward Fading
+      56
+
+⏺ Good. Now let me verify the final structure.
+
+⏺ Searched for 1 pattern (ctrl+o to expand)
+
+⏺ Structure is correct. Now let me re-run the plugin validator to confirm all issues are resolved.
+
+⏺ plugin-dev:plugin-validator(Re-validate fixed plugin)
+  ⎿  Done (29 tool uses · 39.1k tokens · 2m 17s)
+  (ctrl+o to expand)
+
+⏺ Validation Result: PASS
+
+  All 9 issues resolved:
+
+  ┌─────┬────────────────────────────────────────────┬───────────────────────────────────────────────────────────────────────────────┐
+  │  #  │                   Issue                    │                                    Status                                     │
+  ├─────┼────────────────────────────────────────────┼───────────────────────────────────────────────────────────────────────────────┤
+  │ 1   │ Missing .claude-plugin/plugin.json         │ Fixed — created with name, version, description                               │
+  ├─────┼────────────────────────────────────────────┼───────────────────────────────────────────────────────────────────────────────┤
+  │ 2   │ Skills at root instead of skills/          │ Fixed — all 8 moved to skills/*/SKILL.md                                      │
+  ├─────┼────────────────────────────────────────────┼───────────────────────────────────────────────────────────────────────────────┤
+  │ 3   │ Missing requirements.txt                   │ Fixed — genanki>=0.13.0                                                       │
+  ├─────┼────────────────────────────────────────────┼───────────────────────────────────────────────────────────────────────────────┤
+  │ 4   │ Duplicate session-templates.md             │ Fixed — removed material-forge copy, cross-references training-conductor's    │
+  │     │                                            │ authoritative version                                                         │
+  ├─────┼────────────────────────────────────────────┼───────────────────────────────────────────────────────────────────────────────┤
+  │ 5   │ Path references broken after restructure   │ Fixed — all 100% of file references resolve correctly                         │
+  ├─────┼────────────────────────────────────────────┼───────────────────────────────────────────────────────────────────────────────┤
+  │ 6   │ Orchestrator used directory paths for      │ Fixed — now uses (skill: \name`)` notation                                    │
+  │     │ components                                 │                                                                               │
+  ├─────┼────────────────────────────────────────────┼───────────────────────────────────────────────────────────────────────────────┤
+  │ 7   │ Schema nesting in                          │ False positive — schema is correct as-is                                      │
+  │     │ learning-plan.schema.json                  │                                                                               │
+  ├─────┼────────────────────────────────────────────┼───────────────────────────────────────────────────────────────────────────────┤
+  │ 8   │ Missing .gitignore                         │ Fixed — covers all 6 state JSONs, .apkg, materials/, external-imports/,       │
+  │     │                                            │ Python cache                                                                  │
+  ├─────┼────────────────────────────────────────────┼───────────────────────────────────────────────────────────────────────────────┤
+  │ 9   │ Script path ambiguity in material-forge    │ Fixed — clarified location within skill directory                             │
+  └─────┴────────────────────────────────────────────┴───────────────────────────────────────────────────────────────────────────────┘
+
+  Final structure:
+  learn-anything-plugin/
+  ├── .claude-plugin/
+  │   └── plugin.json          ← NEW
+  ├── .gitignore                ← NEW
+  ├── requirements.txt          ← NEW
+  ├── schemas/                  (7 JSON schemas, unchanged)
+  └── skills/                   ← NEW parent
+      ├── orchestrator/
+      ├── domain-assessor/
+      ├── skill-researcher/
+      ├── learner-calibrator/
+      ├── curriculum-architect/
+      ├── material-forge/
+      ├── training-conductor/
+      └── dashboard-generator/
+
+  One optional recommendation from the validator: add a README.md at the plugin root. Not required for functionality but would help
+  onboarding. Want me to create one?
+
+✻ Brewed for 4m 39s
+
+❯ yes
+
+⏺ Write(learn-anything-plugin/README.md)
+  ⎿  Wrote 89 lines to learn-anything-plugin/README.md
+      1 # learn-anything
+      2
+      3 A Claude Code plugin that helps people learn any skill efficiently. It synthesizes Tim Ferriss' DiSSS/CaFE meta-learning f
+        rameworks with evidence-based enhancements from cognitive psychology, instructional design, and motivation science.
+      4
+      5 The system is domain-agnostic: Spanish, guitar, negotiation, programming, pharmacology, cooking, chess — any skill.
+      6
+      7 ## Pipeline
+      8
+      9 Eight skills form a sequential pipeline, managed by the orchestrator:
+     … +79 lines (ctrl+o to expand)
+
+⏺ Done. The README covers the pipeline overview, all 8 skills, state files, prerequisites, installation, key frameworks, and the Anki
+  round-trip flow.
+
+✻ Crunched for 31s
+
+❯ ok, how do i add it as a marketplace
+
+⏺ Skill(claude-code-guide)
+  ⎿  Initializing…
+  ⎿  Error: Unknown skill: claude-code-guide
+
+⏺ claude-code-guide(Research plugin marketplace publishing)
+  ⎿  Done (3 tool uses · 45.4k tokens · 21s)
+  (ctrl+o to expand)
+
+⏺ Two paths to publish:
+
+  Option 1: Official Anthropic Marketplace (recommended for reach)
+
+  Submit via:
+  - Claude.ai: claude.ai/settings/plugins/submit
+  - Console: platform.claude.com/plugins/submit
+
+  Once approved, your plugin appears in the Discover tab of /plugin for all Claude Code users.
+
+  Option 2: Self-hosted GitHub Marketplace
+
+  1. Add a marketplace manifest — create .claude-plugin/marketplace.json in the repo:
+
+  {
+    "name": "learn-anything-marketplace",
+    "owner": {
+      "name": "Your Name"
+    },
+    "plugins": [
+      {
+        "name": "learn-anything",
+        "source": "./learn-anything-plugin",
+        "description": "Meta-learning system for efficiently learning any skill",
+        "version": "1.0.0"
+      }
+    ]
+  }
+
+  2. Push to GitHub — push the learn-anything repo
+  3. Users install with: /plugin marketplace add youruser/learn-anything
+
+  Before publishing either way
+
+  - Test locally first: /plugin marketplace add ./path/to/learn-anything
+  - Your plugin.json already has the required name, version, and description
+
+  Which path do you want to go with?
+
+✻ Brewed for 38s
+
+❯ option 2
+
+⏺ Read 1 file (ctrl+o to expand)
+
+⏺ Bash(cd ~/Programming/Infrastructure/Plugin-Library/learn-anything && git remote -v 2>/dev/null; echo "---"; git
+      rev-parse --show-toplevel 2>/dev/null)
+  ⎿  ---
+     ~/Programming/Infrastructure/Plugin-Library/learn-anything
+
+⏺ No git remote set up yet. Let me create the marketplace manifest at the repo root level.
+
+⏺ Bash(mkdir -p ~/Programming/Infrastructure/Plugin-Library/learn-anything/.claude-plugin)
+  ⎿  Done
+
+⏺ Write(.claude-plugin/marketplace.json)
+  ⎿  Wrote 14 lines to .claude-plugin/marketplace.json
+       1 {
+       2   "name": "learn-anything-marketplace",
+       3   "owner": {
+       4     "name": "John Roehm"
+       5   },
+       6   "plugins": [
+       7     {
+       8       "name": "learn-anything",
+       9       "source": "./learn-anything-plugin",
+      10       "description": "A meta-learning system that helps people learn any skill efficiently through adaptive assessment, c
+         urriculum design, spaced repetition, and interactive training.",
+     … +4 lines (ctrl+o to expand)
+
+⏺ Done. Next steps to go live:
+
+  1. Create a GitHub repo and push:
+  cd ~/Programming/Infrastructure/Plugin-Library/learn-anything
+  gh repo create learn-anything --public --source=. --push
+  2. Others install with:
+  /plugin marketplace add youruser/learn-anything
+  3. Test locally first (before pushing):
+  /plugin marketplace add ~/Programming/Infrastructure/Plugin-Library/learn-anything
+
+  Want me to create the repo and push, or do you want to test locally first?
+
+❯ before we do that, i want to scrutenize """# Runtime state files (generated per-learner, per-skill)
+domain-assessment.json
+skill-dossier.json
+knowledge-graph.json
+learning-plan.json
+srs-cards.json
+progress.json""" - how will that actually work in practice? e.g., multiple skills being learned, plugin is being imported into other
+directories
+
+⏺ Great question — this exposes a real architectural gap. Let me break down how it actually works:
+
+  Where state files live: The plugin gets cached to ~/.claude/plugins/cache/ when installed. State files (domain-assessment.json, etc.)
+  are written to the user's project directory (their CWD), not the plugin directory.
+
+  So the .gitignore in the plugin repo:
+  - Only matters during plugin development/testing
+  - Does NOT affect the user's project at all
+  - Users would need their own .gitignore entries
+
+  Multi-skill collision: If a user learns Spanish then starts guitar, domain-assessment.json for Spanish gets overwritten. The
+  orchestrator SKILL.md mentions "namespacing or archiving" (line 153) but no actual mechanism is defined.
+
+  There are two things to address:
+
+  1. The .gitignore should be scoped to the plugin repo (development artifacts only), not pretend it manages user state
+  2. Multi-skill needs a namespacing scheme in the state file paths
+
+  The simplest namespacing approach: a learn-anything/ directory in the user's project with skill-specific subdirectories:
+
+  <user-project>/
+  └── learn-anything/
+      ├── spanish/
+      │   ├── domain-assessment.json
+      │   ├── skill-dossier.json
+      │   └── ...
+      └── guitar/
+          ├── domain-assessment.json
+          └── ...
+
+  This keeps state organized, prevents collisions, and is easy to .gitignore with a single learn-anything/ entry.
+
+  Want me to update the orchestrator and all skills to use this namespaced directory structure? That would touch:
+  - The orchestrator's phase detection logic (check for learn-anything/<skill>/ dirs)
+  - Each skill's input/output file paths
+  - The .gitignore (simplify to just learn-anything/)
+
+❯ yes
+
+⏺ Let me read the remaining SKILL.md files at their new paths, then make all edits.
+
+⏺ Read 6 files (ctrl+o to expand)
+
+⏺ Now I'll make all the edits. Starting with the orchestrator (most complex), then all other skills in parallel.
+
+⏺ Update(learn-anything-plugin/skills/orchestrator/SKILL.md)
+  ⎿  Added 39 lines, removed 8 lines
+      17  6. **Training Conductor** (skill: `training-conductor`) — Session-by-session teaching and assessment
+      18  7. **Dashboard Generator** (skill: `dashboard-generator`) — Visual progress artifact
+      19
+      20 +## Skill Workspace
+      21 +
+      22 +Each target skill has its own workspace directory under `learn-anything/` in the user's project:
+      23 +
+      24 +```
+      25 +learn-anything/
+      26 +├── active-skill.json          ← Tracks the current skill slug
+      27 +├── spanish/
+      28 +│   ├── domain-assessment.json
+      29 +│   ├── skill-dossier.json
+      30 +│   ├── knowledge-graph.json
+      31 +│   ├── learning-plan.json
+      32 +│   ├── srs-cards.json
+      33 +│   ├── progress.json
+      34 +│   ├── materials/
+      35 +│   └── external-imports/
+      36 +└── classical-guitar/
+      37 +    └── (same structure)
+      38 +```
+      39 +
+      40 +**`learn-anything/active-skill.json`** tracks which skill workspace is active:
+      41 +```json
+      42 +{
+      43 +  "active": "spanish"
+      44 +}
+      45 +```
+      46 +
+      47 +**Skill slug**: Derived from the target skill name — lowercase, hyphenated (e.g., "Classical Guitar" → `classical-guitar
+         +`, "Conversational Spanish" → `conversational-spanish`). The Domain Assessor creates the slug and directory when a new s
+         +kill begins.
+      48 +
+      49 +All state file paths throughout the system use the pattern `learn-anything/<skill-slug>/<filename>`.
+      50 +
+      51  ## State Files
+      52
+      22 -These JSON files in the project are the system's persistent state. Their existence determines pipeline phase:
+      53 +These JSON files in the active skill workspace are the system's persistent state. Their existence determines pipeline ph
+         +ase:
+      54
+      55  | File | Written By | Indicates |
+      56  |---|---|---|
+      26 -| `domain-assessment.json` | Domain Assessor | Skill classified, learner profiled |
+      27 -| `skill-dossier.json` | Skill Researcher | Skill researched, dependency graph built |
+      28 -| `knowledge-graph.json` | Learner Calibrator | Learner assessed, gap map ready |
+      29 -| `learning-plan.json` | Curriculum Architect | Curriculum designed, schedule set |
+      30 -| `srs-cards.json` | Material Forge | Flashcards generated |
+      31 -| `progress.json` | Training Conductor | Training in progress |
+      32 -| `external-imports/` | User/external tools | Data waiting to be processed |
+      57 +| `learn-anything/<slug>/domain-assessment.json` | Domain Assessor | Skill classified, learner profiled |
+      58 +| `learn-anything/<slug>/skill-dossier.json` | Skill Researcher | Skill researched, dependency graph built |
+      59 +| `learn-anything/<slug>/knowledge-graph.json` | Learner Calibrator | Learner assessed, gap map ready |
+      60 +| `learn-anything/<slug>/learning-plan.json` | Curriculum Architect | Curriculum designed, schedule set |
+      61 +| `learn-anything/<slug>/srs-cards.json` | Material Forge | Flashcards generated |
+      62 +| `learn-anything/<slug>/progress.json` | Training Conductor | Training in progress |
+      63 +| `learn-anything/<slug>/external-imports/` | User/external tools | Data waiting to be processed |
+      64
+      65  ## Routing Logic
+      66
+
+⏺ Update(learn-anything-plugin/skills/orchestrator/SKILL.md)
+  ⎿  Added 18 lines, removed 8 lines
+       66
+       67  ### Phase Detection
+       68
+       69 -On every interaction, determine the current phase by checking which state files exist:
+       69 +On every interaction:
+       70
+       71 +1. **Resolve the active workspace.** Read `learn-anything/active-skill.json` to get the current skill slug. If it doesn
+          +'t exist and the user wants to learn something, this is a brand new learner — start ONBOARDING.
+       72 +2. **Check state files** in `learn-anything/<slug>/` to determine phase:
+       73 +
+       74  ```
+       72 -IF user says "I want to learn [something new]" OR no state files exist:
+       73 -  -> PHASE: ONBOARDING (start from the beginning)
+       75 +IF user says "I want to learn [something new]":
+       76 +  -> PHASE: ONBOARDING
+       77 +  -> Generate slug from skill name (lowercase, hyphenated)
+       78 +  -> Create directory: learn-anything/<slug>/
+       79 +  -> Write/update learn-anything/active-skill.json with {"active": "<slug>"}
+       80 +  -> ROUTE to Domain Assessor
+       81
+       75 -ELIF domain-assessment.json does NOT exist:
+       82 +ELIF no active-skill.json OR no state files in active workspace:
+       83 +  -> ROUTE to Domain Assessor (new skill)
+       84 +
+       85 +ELIF learn-anything/<slug>/domain-assessment.json does NOT exist:
+       86    -> ROUTE to Domain Assessor
+       87
+       78 -ELIF skill-dossier.json does NOT exist:
+       88 +ELIF learn-anything/<slug>/skill-dossier.json does NOT exist:
+       89    -> ROUTE to Skill Researcher
+       90
+       81 -ELIF knowledge-graph.json does NOT exist:
+       91 +ELIF learn-anything/<slug>/knowledge-graph.json does NOT exist:
+       92    -> ROUTE to Learner Calibrator
+       93
+       84 -ELIF learning-plan.json does NOT exist:
+       94 +ELIF learn-anything/<slug>/learning-plan.json does NOT exist:
+       95    -> ROUTE to Curriculum Architect
+       96
+       87 -ELIF srs-cards.json does NOT exist:
+       97 +ELIF learn-anything/<slug>/srs-cards.json does NOT exist:
+       98    -> ROUTE to Material Forge (full generation mode)
+       99    -> After Forge completes: generate Dashboard, TRANSITION to LEARNING phase
+      100
+
+⏺ Update(learn-anything-plugin/skills/orchestrator/SKILL.md)
+  ⎿  Added 5 lines, removed 3 lines
+      188
+      189  **"Generate more cards / materials"** -> Route to Material Forge (on-demand mode)
+      190  **"Show my knowledge graph / progress"** -> Route to Dashboard Generator
+      191 -**"I've been practicing in Anki"** -> Ask for the .apkg export, create an external import file, route to Training Condu
+          -ctor which will process it at session start
+      192 -**"I want to add a self-report"** -> Structure the report as JSON per the external-import schema, save to `external-imp
+          -orts/`, note it will be processed at next session start
+      191 +**"I've been practicing in Anki"** -> Ask for the .apkg export, create an external import file in `learn-anything/<slug
+          +>/external-imports/`, route to Training Conductor which will process it at session start
+      192 +**"I want to add a self-report"** -> Structure the report as JSON per the external-import schema, save to `learn-anythi
+          +ng/<slug>/external-imports/`, note it will be processed at next session start
+      193  **"My goals have changed"** -> Assess the scope of change and route appropriately
+      194 -**"I want to start a new skill"** -> Confirm this is separate from the current skill (or a replacement), then start a n
+          -ew onboarding flow. Preserve existing state files by namespacing or archiving.
+      194 +**"I want to start a new skill"** -> Create a new workspace directory under `learn-anything/` with a new slug. Update `
+          +learn-anything/active-skill.json` to point to it. Start a new onboarding flow. The previous skill's workspace is preser
+          +ved intact.
+      195 +**"Switch to [other skill]"** -> List available skills by scanning `learn-anything/` subdirectories. Update `learn-anyt
+          +hing/active-skill.json` to the selected slug. Resume from wherever that skill left off.
+      196 +**"What skills am I learning?"** -> List all `learn-anything/*/domain-assessment.json` files and show skill name + curr
+          +ent phase for each.
+      197
+      198  ## Key Rules
+      199
+
+⏺ Good. Now update all 6 non-orchestrator skills in parallel — adding workspace convention and updating file paths.
+
+⏺ Update(learn-anything-plugin/skills/domain-assessor/SKILL.md)
+  ⎿  Added 4 lines
+       7
+       8  You are the entry point of a meta-learning system that helps people learn any skill efficiently. Your job is to classify
+           the target skill, understand the learner's starting point, and set a constructive strategy for everything downstream.
+       9
+      10 +## Workspace
+      11 +
+      12 +All state files for a skill live in `learn-anything/<skill-slug>/` where `<skill-slug>` is the kebab-case target skill n
+         +ame (e.g., "Classical Guitar" → `classical-guitar`). As the first skill in the pipeline, you create this directory and w
+         +rite `learn-anything/active-skill.json` if they don't already exist. Read `learn-anything/active-skill.json` to find the
+         + active skill slug if resuming an existing skill.
+      13 +
+      14  ## Your Posture
+      15
+      16  Be constructive, not cautionary. Never lecture about limitations. For every goal + timeframe, produce BOTH:
+
+⏺ Update(learn-anything-plugin/skills/domain-assessor/SKILL.md)
+  ⎿  Added 7 lines, removed 2 lines
+      100
+      101  Write the complete Domain Assessment Profile as structured JSON conforming to `schemas/domain-assessment.schema.json`.
+           Read the schema file first to ensure all required fields are present.
+      102
+      103 +**Create the skill workspace** if this is a new skill:
+      104 +1. Derive the skill slug from the target skill name (lowercase, hyphenated)
+      105 +2. Create the directory `learn-anything/<skill-slug>/`
+      106 +3. Write or update `learn-anything/active-skill.json` with `{"active": "<skill-slug>"}`
+      107 +
+      108 +Save the JSON to `learn-anything/<skill-slug>/domain-assessment.json`.
+      109 +
+      110  Present a conversational summary to the learner covering:
+      111  1. How you've classified their skill and what that means for the approach
+      112  2. Their short-term plan (specific, energizing)
+     ...
+      114  4. The identity frame
+      115  5. What happens next (the Skill Researcher will do a deep dive)
+      116
+      110 -Save the JSON to `domain-assessment.json` in the project.
+      111 -
+      117  ## Key Rules
+      118
+      119  - NEVER present classification as a warning or limitation. Present it as "here's the approach that works best for this
+           type of skill."
+
+⏺ Update(learn-anything-plugin/skills/skill-researcher/SKILL.md)
+  ⎿  Added 5 lines, removed 1 line
+       7
+       8  You are the research engine of a meta-learning system. Your job is to deeply investigate a target skill, decompose it in
+          to its fundamental components, build a dependency graph, identify which components matter most, find transfer pathways f
+          rom the learner's existing skills, and catalog common failure points.
+       9
+      10 +## Workspace
+      11 +
+      12 +All state files live in `learn-anything/<skill-slug>/`. Read `learn-anything/active-skill.json` to find the active skill
+         + slug.
+      13 +
+      14  ## Inputs
+      15
+      16  Before starting, read:
+      13 -1. `domain-assessment.json` — The skill classification and learner profile
+      17 +1. `learn-anything/<skill-slug>/domain-assessment.json` — The skill classification and learner profile
+      18  2. `schemas/skill-dossier.schema.json` — The output format you must produce
+      19  3. `references/expert-interview-protocol.md` — The Ferriss interview questions and deconstruction techniques
+      20
+
+⏺ Update(learn-anything-plugin/skills/skill-researcher/SKILL.md)
+  ⎿  Added 1 line, removed 1 line
+      123
+      124  ### Step 8: Produce Output
+      125
+      126 -Write the complete Skill Research Dossier as JSON conforming to `schemas/skill-dossier.schema.json`. Verify every requi
+          -red field is present. Save to `skill-dossier.json`.
+      126 +Write the complete Skill Research Dossier as JSON conforming to `schemas/skill-dossier.schema.json`. Verify every requi
+          +red field is present. Save to `learn-anything/<skill-slug>/skill-dossier.json`.
+      127
+      128  Present a conversational summary to the learner covering:
+      129  1. The major component clusters you identified (using plain language, not vertex IDs)
+
+⏺ Update(learn-anything-plugin/skills/skill-researcher/SKILL.md)
+  ⎿  Added 1 line, removed 1 line
+      103
+      104  ### Step 6: Transfer Pathway Identification
+      105
+      106 -Read the learner's related experience from `domain-assessment.json`. For each related skill:
+      106 +Read the learner's related experience from the domain assessment. For each related skill:
+      107
+      108  1. Identify which components of the TARGET skill are semantically similar to the learner's EXISTING skills
+      109  2. Classify the transfer type:
+
+⏺ Update(learn-anything-plugin/skills/learner-calibrator/SKILL.md)
+  ⎿  Added 6 lines, removed 2 lines
+       7
+       8  You are the diagnostic engine of a meta-learning system. Your job is to efficiently map a learner's existing knowledge o
+          nto the skill dependency graph, producing the knowledge graph overlay — the precise "gap map" that tells the Curriculum
+          Architect exactly what to teach and what to skip.
+       9
+      10 +## Workspace
+      11 +
+      12 +All state files live in `learn-anything/<skill-slug>/`. Read `learn-anything/active-skill.json` to find the active skill
+         + slug.
+      13 +
+      14  ## Inputs
+      15
+      16  Before starting, read:
+      13 -1. `domain-assessment.json` — The learner profile, especially related experience
+      14 -2. `skill-dossier.json` — The dependency graph (vertices and edges) and transfer pathways
+      17 +1. `learn-anything/<skill-slug>/domain-assessment.json` — The learner profile, especially related experience
+      18 +2. `learn-anything/<skill-slug>/skill-dossier.json` — The dependency graph (vertices and edges) and transfer pathways
+      19  3. `schemas/knowledge-graph.schema.json` — The output format
+      20  4. `references/diagnostic-algorithm.md` — The full assessment algorithm and question design principles
+      21
+
+⏺ Update(learn-anything-plugin/skills/learner-calibrator/SKILL.md)
+  ⎿  Added 1 line, removed 1 line
+      115
+      116  ### Step 7: Produce Output
+      117
+      118 -Write the complete Knowledge Graph as JSON conforming to `schemas/knowledge-graph.schema.json`. Save to `knowledge-grap
+          -h.json`.
+      118 +Write the complete Knowledge Graph as JSON conforming to `schemas/knowledge-graph.schema.json`. Save to `learn-anything
+          +/<skill-slug>/knowledge-graph.json`.
+      119
+      120  Present a conversational summary to the learner:
+      121  1. What they already know (celebrate this — it's motivating)
+
+⏺ Update(learn-anything-plugin/skills/curriculum-architect/SKILL.md)
+  ⎿  Added 6 lines, removed 2 lines
+       7
+       8  You design the bridge between where the learner is and where they want to be. You work from the gap — not from scratch —
+           leveraging existing knowledge as scaffolding and transfer pathways as accelerators.
+       9
+      10 +## Workspace
+      11 +
+      12 +All state files live in `learn-anything/<skill-slug>/`. Read `learn-anything/active-skill.json` to find the active skill
+         + slug.
+      13 +
+      14  ## Inputs
+      15
+      16  Before starting, read:
+      13 -1. `domain-assessment.json` — Skill classification, learner constraints, approach strategy, identity frame
+      14 -2. `knowledge-graph.json` — The gap map: dependency graph with learner overlay, priority gaps, transfer leverage
+      17 +1. `learn-anything/<skill-slug>/domain-assessment.json` — Skill classification, learner constraints, approach strategy,
+         +identity frame
+      18 +2. `learn-anything/<skill-slug>/knowledge-graph.json` — The gap map: dependency graph with learner overlay, priority gap
+         +s, transfer leverage
+      19  3. `schemas/learning-plan.schema.json` — Output format
+      20  4. `references/4cid-encoding.md` — Curriculum generation rules (4C/ID, Elaboration Theory, Productive Failure, interleav
+          ing, spacing, mastery gates)
+      21  5. `references/motivation-architecture.md` — Seven-layer motivation system
+
+⏺ Update(learn-anything-plugin/skills/curriculum-architect/SKILL.md)
+  ⎿  Added 1 line, removed 1 line
+      128
+      129  ### Step 5: Produce Output
+      130
+      131 -Write the complete Learning Plan as JSON conforming to `schemas/learning-plan.schema.json`. Save to `learning-plan.json
+          -`.
+      131 +Write the complete Learning Plan as JSON conforming to `schemas/learning-plan.schema.json`. Save to `learn-anything/<sk
+          +ill-slug>/learning-plan.json`.
+      132
+      133  Present a conversational summary to the learner:
+      134  1. The epitome — what they'll do first and why
+
+⏺ Now the material-forge, training-conductor, and dashboard-generator.
+
+⏺ Update(learn-anything-plugin/skills/material-forge/SKILL.md)
+  ⎿  Added 6 lines, removed 2 lines
+       7
+       8  You are the production engine of a meta-learning system. You generate all the tangible learning materials: flashcard dec
+          ks, exercises, reference sheets, assessments, and visualizations. Quality is make-or-break — bad materials produce bad l
+          earning.
+       9
+      10 +## Workspace
+      11 +
+      12 +All state files live in `learn-anything/<skill-slug>/`. Read `learn-anything/active-skill.json` to find the active skill
+         + slug.
+      13 +
+      14  ## Inputs
+      15
+      16  Before starting, read:
+      13 -1. `learning-plan.json` — The curriculum: task classes, sequences, session templates, SRS schedule
+      14 -2. `knowledge-graph.json` — The skill graph with learner overlay (for difficulty calibration and transfer-leveraged anal
+         -ogies)
+      17 +1. `learn-anything/<skill-slug>/learning-plan.json` — The curriculum: task classes, sequences, session templates, SRS sc
+         +hedule
+      18 +2. `learn-anything/<skill-slug>/knowledge-graph.json` — The skill graph with learner overlay (for difficulty calibration
+         + and transfer-leveraged analogies)
+      19  3. `schemas/srs-cards.schema.json` — Flashcard output format
+      20  4. `references/card-design-guide.md` — Card design principles and anti-patterns
+      21  5. `references/quality-rubrics.md` — Quality checks for all material types
+
+⏺ Update(learn-anything-plugin/skills/material-forge/SKILL.md)
+  ⎿  Added 1 line, removed 1 line
+      54  ```
+      55  Store in srs-cards.json and NEVER change these IDs.
+      56
+      57 -Write the complete card set to `srs-cards.json` conforming to the schema. Then run the Anki export script at `scripts/ge
+         -nerate_anki.py` (located within this skill's directory) with `srs-cards.json` as input to produce the .apkg file.
+      57 +Write the complete card set to `learn-anything/<skill-slug>/srs-cards.json` conforming to the schema. Then run the Anki
+         +export script at `scripts/generate_anki.py` (located within this skill's directory) with the srs-cards.json path as inpu
+         +t to produce the .apkg file in the skill workspace.
+      58
+      59  ### 2. Worked Examples with Backward Fading
+      60
+
+⏺ Update(learn-anything-plugin/skills/material-forge/SKILL.md)
+  ⎿  Added 1 line, removed 1 line
+      186
+      187  ## Output
+      188
+      189 -Save all materials to the project:
+      189 +Save all materials to the skill workspace (`learn-anything/<skill-slug>/`):
+      190  - `srs-cards.json` — Full flashcard set (schema-conforming)
+      191  - `[plan-id].apkg` — Anki export (generated by running the script)
+      192  - `materials/` directory with:
+
+⏺ Update(learn-anything-plugin/skills/training-conductor/SKILL.md)
+  ⎿  Added 8 lines, removed 4 lines
+      19
+      20  **Adjust difficulty ONLY based on performance data** — not emotional appeals, not self-reported confidence, not how much
+           the learner says they already know.
+      21
+      22 +## Workspace
+      23 +
+      24 +All state files live in `learn-anything/<skill-slug>/`. Read `learn-anything/active-skill.json` to find the active skill
+         + slug.
+      25 +
+      26  ## Reference Files
+      27
+      28  Read these as needed (not all at once — load the relevant one for the session type):
+     ...
+      34
+      35  At the start of EVERY session:
+      36
+      33 -1. **Read `progress.json`** — Get current curriculum position, next session agenda, motivation state, recent session sum
+         -maries
+      34 -2. **Read `learning-plan.json`** — Load only the current task class and its immediate neighbors
+      35 -3. **Read `knowledge-graph.json`** — Load mastery states for vertices relevant to today's session
+      36 -4. **Check for external imports** — If `external-imports/` contains new files, process them:
+      37 +1. **Read `learn-anything/<skill-slug>/progress.json`** — Get current curriculum position, next session agenda, motivati
+         +on state, recent session summaries
+      38 +2. **Read `learn-anything/<skill-slug>/learning-plan.json`** — Load only the current task class and its immediate neighb
+         +ors
+      39 +3. **Read `learn-anything/<skill-slug>/knowledge-graph.json`** — Load mastery states for vertices relevant to today's se
+         +ssion
+      40 +4. **Check for external imports** — If `learn-anything/<skill-slug>/external-imports/` contains new files, process them:
+      41     - For Anki reviews: map card_id -> component_id -> mastery delta (see `references/assessment-types.md`)
+      42     - For self-reports: extract component observations -> small mastery deltas
+      43     - Update knowledge graph vertices accordingly
+
+⏺ Update(learn-anything-plugin/skills/training-conductor/SKILL.md)
+  ⎿  Added 1 line, removed 1 line
+       95
+       96  ## Knowledge Graph Updates
+       97
+       98 -After each session, update `knowledge-graph.json`:
+       98 +After each session, update `learn-anything/<skill-slug>/knowledge-graph.json`:
+       99
+      100  For each vertex touched during the session:
+      101  - Update `mastery_probability` based on assessment results and teaching observations
+
+⏺ Update(learn-anything-plugin/skills/training-conductor/SKILL.md)
+  ⎿  Added 1 line, removed 1 line
+      111
+      112  ## Progress State Updates
+      113
+      114 -After each session, update `progress.json`:
+      114 +After each session, update `learn-anything/<skill-slug>/progress.json`:
+      115
+      116  Add a session entry with:
+      117  - session_id, date, duration, template_used
+
+⏺ Update(learn-anything-plugin/skills/training-conductor/SKILL.md)
+  ⎿  Added 1 line, removed 1 line
+      168
+      169  ## Domain-Specific Adaptations
+      170
+      171 -Adapt your teaching approach based on the skill type from `domain-assessment.json`:
+      171 +Adapt your teaching approach based on the skill type from the domain assessment:
+      172
+      173  **Cognitive skills** (strongest AI fit): Full Socratic dialogue. Can verify code, check math, test reasoning directly.
+           Use all templates freely.
+      174
+
+⏺ Update(learn-anything-plugin/skills/dashboard-generator/SKILL.md)
+  ⎿  Added 7 lines, removed 3 lines
+       7
+       8  You generate a React artifact (.jsx) that serves as the learner's visual home base. It displays their knowledge graph wi
+          th mastery overlay, curriculum position, key metrics, and upcoming agenda.
+       9
+      10 +## Workspace
+      11 +
+      12 +All state files live in `learn-anything/<skill-slug>/`. Read `learn-anything/active-skill.json` to find the active skill
+         + slug.
+      13 +
+      14  ## Inputs
+      15
+      16  Read these files to populate the dashboard:
+      13 -1. `knowledge-graph.json` — The dependency graph with learner mastery overlay
+      14 -2. `learning-plan.json` — Curriculum structure, schedule, milestones
+      15 -3. `progress.json` — Session history, mastery transitions, current state
+      17 +1. `learn-anything/<skill-slug>/knowledge-graph.json` — The dependency graph with learner mastery overlay
+      18 +2. `learn-anything/<skill-slug>/learning-plan.json` — Curriculum structure, schedule, milestones
+      19 +3. `learn-anything/<skill-slug>/progress.json` — Session history, mastery transitions, current state
+      20
+      21  ## Dashboard Layout
+      22
+
+⏺ Now update the .gitignore and README.md to reflect the new workspace convention.
+
+⏺ Read 1 file (ctrl+o to expand)
+
+⏺ Update(learn-anything-plugin/.gitignore)
+  ⎿  Added 2 lines, removed 14 lines
+       1 -# Runtime state files (generated per-learner, per-skill)
+       2 -domain-assessment.json
+       3 -skill-dossier.json
+       4 -knowledge-graph.json
+       5 -learning-plan.json
+       6 -srs-cards.json
+       7 -progress.json
+       1 +# Skill workspaces (all runtime state, generated materials, and exports)
+       2 +learn-anything/
+       3
+       9 -# Generated outputs
+      10 -*.apkg
+      11 -materials/
+      12 -
+      13 -# External imports (user-provided data)
+      14 -external-imports/
+      15 -
+       4  # Python
+       5  __pycache__/
+       6  *.pyc
+
+⏺ Update(learn-anything-plugin/README.md)
+  ⎿  Added 18 lines, removed 1 line
+      43
+      44  ## State Files
+      45
+      46 -The pipeline communicates through JSON state files written to the user's project:
+      46 +Each skill gets its own workspace under `learn-anything/<skill-slug>/` in the user's project. The active skill is tracke
+         +d in `learn-anything/active-skill.json`. This supports learning multiple skills simultaneously without file collisions.
+      47
+      48 +```
+      49 +<user-project>/
+      50 +└── learn-anything/
+      51 +    ├── active-skill.json
+      52 +    ├── spanish/
+      53 +    │   ├── domain-assessment.json
+      54 +    │   ├── skill-dossier.json
+      55 +    │   ├── knowledge-graph.json
+      56 +    │   ├── learning-plan.json
+      57 +    │   ├── srs-cards.json
+      58 +    │   ├── progress.json
+      59 +    │   ├── materials/
+      60 +    │   └── external-imports/
+      61 +    └── classical-guitar/
+      62 +        └── (same structure)
+      63 +```
+      64 +
+      65  | File | Producer | Schema |
+      66  |---|---|---|
+      67  | `domain-assessment.json` | Domain Assessor | `schemas/domain-assessment.schema.json` |
+
+⏺ All edits complete. Let me do a quick verification grep to make sure no bare state file references remain.
+
+⏺ Searched for 2 patterns (ctrl+o to expand)
+
+⏺ Two remaining bare references — both are in contextual sections where the workspace is already established. Let me check them.
+
+⏺ Searched for 1 pattern (ctrl+o to expand)
+
+⏺ Line 124 is in the Calibration Loop narrative — the workspace context is clear from the surrounding section. Line 190 in material-forge
+   is under "Save all materials to the skill workspace" header. Both are fine contextually. No further changes needed.
+
+  Done. Here's a summary of what changed:
+
+  Workspace convention added to all 8 skills:
+  - learn-anything/<skill-slug>/ directory per target skill
+  - learn-anything/active-skill.json tracks active skill
+  - Domain Assessor creates the workspace and active-skill file
+  - Orchestrator manages switching between skills, listing skills
+
+  Files updated:
+  - skills/orchestrator/SKILL.md — New "Skill Workspace" section, namespaced phase detection, multi-skill commands (switch, list)
+  - skills/domain-assessor/SKILL.md — Workspace section, creates directory + active-skill.json on new skill
+  - skills/skill-researcher/SKILL.md — Workspace section, namespaced input/output paths
+  - skills/learner-calibrator/SKILL.md — Workspace section, namespaced input/output paths
+  - skills/curriculum-architect/SKILL.md — Workspace section, namespaced input/output paths
+  - skills/material-forge/SKILL.md — Workspace section, namespaced input/output paths
+  - skills/training-conductor/SKILL.md — Workspace section, namespaced input/output/import paths
+  - skills/dashboard-generator/SKILL.md — Workspace section, namespaced input paths
+  - .gitignore — Simplified to just learn-anything/
+  - README.md — Updated state files section with workspace tree
+
+✻ Cooked for 4m 12s
+
+❯ please update the readme to enhance the installation steps to make it more clear. let's also add instructions for uv install.
+
+⏺ Read 1 file (ctrl+o to expand)
+
+⏺ Update(learn-anything-plugin/README.md)
+  ⎿  Added 34 lines, removed 2 lines
+       74
+       75  ## Prerequisites
+       76
+       77 -Python 3 with the `genanki` package (for Anki deck export):
+       77 +Python 3 with the `genanki` package (required for Anki deck export by the Material Forge skill):
+       78
+       79  ```bash
+       80 +# Using uv (recommended)
+       81 +uv pip install -r requirements.txt
+       82 +
+       83 +# Or using pip
+       84  pip install -r requirements.txt
+       85  ```
+       86
+       87  ## Installation
+       88
+       85 -Add this plugin to your Claude Code configuration. The 8 skills will be auto-discovered from the `skills/` directory.
+       89 +### From the marketplace
+       90
+       91 +If this plugin is published to a GitHub-based marketplace:
+       92 +
+       93 +```bash
+       94 +# In Claude Code, run:
+       95 +/plugin marketplace add NetRxn/learn-anything
+       96 +```
+       97 +
+       98 +Then enable the plugin when prompted. All 8 skills are auto-discovered from the `skills/` directory.
+       99 +
+      100 +### From a local path (for development or testing)
+      101 +
+      102 +```bash
+      103 +# In Claude Code, run:
+      104 +/plugin marketplace add /path/to/learn-anything
+      105 +```
+      106 +
+      107 +### Verify installation
+      108 +
+      109 +Once installed, the `meta-learning-orchestrator` skill activates automatically when you say things like "I want to lear
+          +n Spanish" or "teach me guitar". You can also check `/plugin` to confirm the plugin is enabled.
+      110 +
+      111 +### Add to your project's .gitignore
+      112 +
+      113 +The plugin writes learner state to a `learn-anything/` directory in your project. Add this to your project's `.gitignor
+          +e`:
+      114 +
+      115 +```
+      116 +learn-anything/
+      117 +```
+      118 +
+      119  ## Key Frameworks
+      120
+      121  - **DiSSS**: Deconstruction, Selection, Sequencing, Stakes
+
+⏺ Done. The installation section now covers:
+
+  - Prerequisites — uv pip install (recommended) and pip install options
+  - Marketplace install — /plugin marketplace add NetRxn/learn-anything
+  - Local install — for development/testing
+  - Verification — how to confirm it's working
+  - Project .gitignore — reminder to exclude the learn-anything/ state directory
+
+❯ /plugin marketplace ~/Programming/Infrastructure/Plugin-Library/learn-anything
+  ⎿  (no content)
