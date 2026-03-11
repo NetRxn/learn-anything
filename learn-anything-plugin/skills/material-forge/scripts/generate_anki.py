@@ -38,23 +38,27 @@ def stable_id(seed: str) -> int:
 # --- Card Styling ---
 
 CARD_CSS = """\
+/* ── Light theme (default) ── */
 .card {
-  font-family:  system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
   font-size: 16px;
   line-height: 1.5;
   color: #1a1a1a;
+  background-color: #ffffff;
   max-width: 600px;
   margin: 0 auto;
   padding: 12px;
 }
 .card code {
   background: #f3f4f6;
+  color: #1a1a1a;
   padding: 2px 5px;
   border-radius: 3px;
   font-size: 14px;
 }
 .card pre {
   background: #f3f4f6;
+  color: #1a1a1a;
   padding: 10px;
   border-radius: 6px;
   overflow-x: auto;
@@ -66,6 +70,9 @@ CARD_CSS = """\
 .card-diagram {
   text-align: center;
   margin: 14px 0;
+  background: #ffffff;
+  border-radius: 8px;
+  padding: 8px;
 }
 .card-diagram svg {
   max-width: 100%;
@@ -82,6 +89,44 @@ hr#answer {
   border: none;
   border-top: 1px solid #ddd;
   margin: 16px 0;
+}
+
+/* ── Dark / Night theme (Anki desktop + AnkiDroid) ── */
+.nightMode .card,
+.night_mode .card {
+  color: #e0e0e0;
+  background-color: #1e1e1e;
+}
+.nightMode .card code,
+.night_mode .card code {
+  background: #2d2d2d;
+  color: #e0e0e0;
+}
+.nightMode .card pre,
+.night_mode .card pre {
+  background: #2d2d2d;
+  color: #e0e0e0;
+}
+.nightMode .card b,
+.nightMode .card strong,
+.night_mode .card b,
+.night_mode .card strong {
+  color: #f0f0f0;
+}
+.nightMode .card-diagram,
+.night_mode .card-diagram {
+  background: #ffffff;
+  border-radius: 8px;
+  padding: 8px;
+}
+.nightMode .card-meta,
+.night_mode .card-meta {
+  color: #777;
+  border-top-color: #333;
+}
+.nightMode hr#answer,
+.night_mode hr#answer {
+  border-top-color: #444;
 }
 """
 
