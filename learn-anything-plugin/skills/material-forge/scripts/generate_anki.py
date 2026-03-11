@@ -4,7 +4,7 @@ generate_anki.py — Export SRS cards to Anki-compatible .apkg file.
 
 Reads an srs-cards.json file (conforming to srs-cards.schema.json) and produces
 an .apkg package importable by Anki. Supports basic, cloze, reversed, and
-comparison card types.
+comparison card types, with optional inline SVG diagrams.
 
 Key design decisions:
 - Model and Deck IDs are hardcoded per the schema's anki_config. Changing them
@@ -14,6 +14,8 @@ Key design decisions:
   graph vertex, enabling round-trip data flow (export -> Anki review -> import).
 - GUIDs are deterministic via genanki.guid_for(card_id), so re-exporting the
   same card updates it in Anki rather than creating a duplicate.
+- Cards with image_svg fields embed inline SVG directly in the HTML. No external
+  media files needed — SVGs are self-contained in the card content.
 
 Usage:
   python generate_anki.py srs-cards.json output.apkg
@@ -21,6 +23,7 @@ Usage:
 """
 
 import json
+import re
 import sys
 import hashlib
 import genanki
@@ -32,28 +35,97 @@ def stable_id(seed: str) -> int:
     return int(h[:8], 16) % (1 << 30) + (1 << 30)
 
 
+# --- Card Styling ---
+
+CARD_CSS = """\
+.card {
+  font-family:  system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  font-size: 16px;
+  line-height: 1.5;
+  color: #1a1a1a;
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 12px;
+}
+.card code {
+  background: #f3f4f6;
+  padding: 2px 5px;
+  border-radius: 3px;
+  font-size: 14px;
+}
+.card pre {
+  background: #f3f4f6;
+  padding: 10px;
+  border-radius: 6px;
+  overflow-x: auto;
+  font-size: 13px;
+}
+.card b, .card strong {
+  color: #111;
+}
+.card-diagram {
+  text-align: center;
+  margin: 14px 0;
+}
+.card-diagram svg {
+  max-width: 100%;
+  height: auto;
+}
+.card-meta {
+  font-size: 10px;
+  color: #999;
+  margin-top: 14px;
+  border-top: 1px solid #eee;
+  padding-top: 6px;
+}
+hr#answer {
+  border: none;
+  border-top: 1px solid #ddd;
+  margin: 16px 0;
+}
+"""
+
+
 # --- Anki Note Models ---
+
 
 def make_basic_model(model_id: int) -> genanki.Model:
     return genanki.Model(
         model_id,
         "MetaLearning Basic",
+        css=CARD_CSS,
         fields=[
             {"name": "Front"},
             {"name": "Back"},
+            {"name": "FrontDiagram"},
+            {"name": "BackDiagram"},
             {"name": "KnowledgeNodeID"},
             {"name": "CardID"},
             {"name": "BloomLevel"},
             {"name": "KnowledgeType"},
             {"name": "Tags"},
         ],
-        templates=[{
-            "name": "Card 1",
-            "qfmt": "{{Front}}",
-            "afmt": '{{FrontSide}}<hr id="answer">{{Back}}'
-                    '<div style="font-size:10px;color:#999;margin-top:12px;">'
-                    '{{BloomLevel}} &middot; {{KnowledgeType}}</div>',
-        }],
+        templates=[
+            {
+                "name": "Card 1",
+                "qfmt": (
+                    '<div class="card">'
+                    "{{Front}}"
+                    '{{#FrontDiagram}}<div class="card-diagram">{{FrontDiagram}}</div>{{/FrontDiagram}}'
+                    "</div>"
+                ),
+                "afmt": (
+                    '<div class="card">'
+                    "{{Front}}"
+                    '{{#FrontDiagram}}<div class="card-diagram">{{FrontDiagram}}</div>{{/FrontDiagram}}'
+                    '<hr id="answer">'
+                    "{{Back}}"
+                    '{{#BackDiagram}}<div class="card-diagram">{{BackDiagram}}</div>{{/BackDiagram}}'
+                    '<div class="card-meta">{{BloomLevel}} &middot; {{KnowledgeType}}</div>'
+                    "</div>"
+                ),
+            }
+        ],
     )
 
 
@@ -62,22 +134,38 @@ def make_cloze_model(model_id: int) -> genanki.Model:
         model_id,
         "MetaLearning Cloze",
         model_type=genanki.Model.CLOZE,
+        css=CARD_CSS,
         fields=[
             {"name": "Text"},
             {"name": "Extra"},
+            {"name": "FrontDiagram"},
+            {"name": "BackDiagram"},
             {"name": "KnowledgeNodeID"},
             {"name": "CardID"},
             {"name": "BloomLevel"},
             {"name": "KnowledgeType"},
             {"name": "Tags"},
         ],
-        templates=[{
-            "name": "Cloze",
-            "qfmt": "{{cloze:Text}}",
-            "afmt": "{{cloze:Text}}<br>{{Extra}}"
-                    '<div style="font-size:10px;color:#999;margin-top:12px;">'
-                    "{{BloomLevel}} &middot; {{KnowledgeType}}</div>",
-        }],
+        templates=[
+            {
+                "name": "Cloze",
+                "qfmt": (
+                    '<div class="card">'
+                    "{{cloze:Text}}"
+                    '{{#FrontDiagram}}<div class="card-diagram">{{FrontDiagram}}</div>{{/FrontDiagram}}'
+                    "</div>"
+                ),
+                "afmt": (
+                    '<div class="card">'
+                    "{{cloze:Text}}"
+                    '{{#FrontDiagram}}<div class="card-diagram">{{FrontDiagram}}</div>{{/FrontDiagram}}'
+                    "<br>{{Extra}}"
+                    '{{#BackDiagram}}<div class="card-diagram">{{BackDiagram}}</div>{{/BackDiagram}}'
+                    '<div class="card-meta">{{BloomLevel}} &middot; {{KnowledgeType}}</div>'
+                    "</div>"
+                ),
+            }
+        ],
     )
 
 
@@ -85,9 +173,12 @@ def make_reversed_model(model_id: int) -> genanki.Model:
     return genanki.Model(
         model_id,
         "MetaLearning Reversed",
+        css=CARD_CSS,
         fields=[
             {"name": "Front"},
             {"name": "Back"},
+            {"name": "FrontDiagram"},
+            {"name": "BackDiagram"},
             {"name": "KnowledgeNodeID"},
             {"name": "CardID"},
             {"name": "BloomLevel"},
@@ -97,13 +188,39 @@ def make_reversed_model(model_id: int) -> genanki.Model:
         templates=[
             {
                 "name": "Forward",
-                "qfmt": "{{Front}}",
-                "afmt": '{{FrontSide}}<hr id="answer">{{Back}}',
+                "qfmt": (
+                    '<div class="card">'
+                    "{{Front}}"
+                    '{{#FrontDiagram}}<div class="card-diagram">{{FrontDiagram}}</div>{{/FrontDiagram}}'
+                    "</div>"
+                ),
+                "afmt": (
+                    '<div class="card">'
+                    "{{Front}}"
+                    '{{#FrontDiagram}}<div class="card-diagram">{{FrontDiagram}}</div>{{/FrontDiagram}}'
+                    '<hr id="answer">'
+                    "{{Back}}"
+                    '{{#BackDiagram}}<div class="card-diagram">{{BackDiagram}}</div>{{/BackDiagram}}'
+                    "</div>"
+                ),
             },
             {
                 "name": "Reverse",
-                "qfmt": "{{Back}}",
-                "afmt": '{{FrontSide}}<hr id="answer">{{Front}}',
+                "qfmt": (
+                    '<div class="card">'
+                    "{{Back}}"
+                    '{{#BackDiagram}}<div class="card-diagram">{{BackDiagram}}</div>{{/BackDiagram}}'
+                    "</div>"
+                ),
+                "afmt": (
+                    '<div class="card">'
+                    "{{Back}}"
+                    '{{#BackDiagram}}<div class="card-diagram">{{BackDiagram}}</div>{{/BackDiagram}}'
+                    '<hr id="answer">'
+                    "{{Front}}"
+                    '{{#FrontDiagram}}<div class="card-diagram">{{FrontDiagram}}</div>{{/FrontDiagram}}'
+                    "</div>"
+                ),
             },
         ],
     )
@@ -121,6 +238,76 @@ class MetaLearningNote(genanki.Note):
         return genanki.guid_for(self._card_id)
 
 
+def sanitize_svg(svg: str, card_id: str = "") -> str:
+    """Sanitize SVG content to prevent XSS via embedded scripts or event handlers.
+
+    Removes <script> elements, on* event handler attributes, href/xlink:href
+    attributes pointing to javascript: URIs, and <foreignObject> elements (which
+    can embed arbitrary HTML). Logs a warning if anything is stripped.
+
+    The SVG content is generated by the Forge itself, not user-supplied, so this
+    is defense-in-depth against malicious edits to srs-cards.json.
+    """
+    original = svg
+
+    # Remove <script>...</script> elements (including self-closing)
+    svg = re.sub(
+        r"<script[\s>].*?</script\s*>", "", svg, flags=re.DOTALL | re.IGNORECASE
+    )
+    svg = re.sub(r"<script\s*/>", "", svg, flags=re.IGNORECASE)
+
+    # Remove on* event handler attributes (onload, onclick, onerror, etc.)
+    svg = re.sub(r'\s+on\w+\s*=\s*["\'][^"\']*["\']', "", svg, flags=re.IGNORECASE)
+    svg = re.sub(r"\s+on\w+\s*=\s*\S+", "", svg, flags=re.IGNORECASE)
+
+    # Remove javascript: URIs in href and xlink:href
+    svg = re.sub(
+        r'((?:xlink:)?href\s*=\s*["\'])\s*javascript:[^"\']*(["\'])',
+        r"\1#\2",
+        svg,
+        flags=re.IGNORECASE,
+    )
+
+    # Remove <foreignObject> elements (can embed arbitrary HTML/JS)
+    svg = re.sub(
+        r"<foreignObject[\s>].*?</foreignObject\s*>",
+        "",
+        svg,
+        flags=re.DOTALL | re.IGNORECASE,
+    )
+
+    if svg != original:
+        label = f" in card {card_id}" if card_id else ""
+        print(
+            f"WARNING: Stripped potentially unsafe content from SVG{label}",
+            file=sys.stderr,
+        )
+
+    return svg
+
+
+def resolve_diagram_fields(card: dict) -> tuple[str, str]:
+    """Extract SVG content into front/back diagram fields based on image_placement.
+
+    SVG is sanitized to remove script injection vectors before embedding.
+    Returns (front_diagram, back_diagram) tuple. Each is either a sanitized SVG
+    string or empty string.
+    """
+    svg = card.get("image_svg", "")
+    if not svg:
+        return ("", "")
+
+    svg = sanitize_svg(svg, card.get("card_id", ""))
+    placement = card.get("image_placement", "back")
+
+    if placement == "front":
+        return (svg, "")
+    elif placement == "both":
+        return (svg, svg)
+    else:  # "back" (default)
+        return ("", svg)
+
+
 def build_deck(deck_data: dict, models: dict) -> genanki.Deck:
     """Build a genanki Deck from a deck entry in srs-cards.json."""
     deck_name = deck_data["deck_name"]
@@ -136,14 +323,18 @@ def build_deck(deck_data: dict, models: dict) -> genanki.Deck:
         tags_str = ", ".join(card.get("topic_tags", []))
         anki_tags = [t.replace("::", "_") for t in card.get("topic_tags", [])]
 
+        front_diagram, back_diagram = resolve_diagram_fields(card)
+
         if card_type == "cloze":
             model = models["cloze"]
             note = MetaLearningNote(
                 card_id=card_id,
                 model=model,
                 fields=[
-                    card["front"],         # Text (with {{c1::...}} syntax)
-                    card.get("back", ""),   # Extra
+                    card["front"],  # Text (with {{c1::...}} syntax)
+                    card.get("back", ""),  # Extra
+                    front_diagram,  # FrontDiagram
+                    back_diagram,  # BackDiagram
                     component_id,
                     card_id,
                     bloom,
@@ -160,6 +351,8 @@ def build_deck(deck_data: dict, models: dict) -> genanki.Deck:
                 fields=[
                     card["front"],
                     card["back"],
+                    front_diagram,
+                    back_diagram,
                     component_id,
                     card_id,
                     bloom,
@@ -177,6 +370,8 @@ def build_deck(deck_data: dict, models: dict) -> genanki.Deck:
                 fields=[
                     card["front"],
                     card["back"],
+                    front_diagram,
+                    back_diagram,
                     component_id,
                     card_id,
                     bloom,
@@ -200,9 +395,15 @@ def generate_apkg(srs_cards_path: str, output_path: str = None):
 
     # Resolve model IDs — use anki_config if present, otherwise generate deterministically
     anki_config = data.get("anki_config", {})
-    basic_model_id = anki_config.get("model_id_basic", stable_id(f"model:basic:{plan_id}"))
-    cloze_model_id = anki_config.get("model_id_cloze", stable_id(f"model:cloze:{plan_id}"))
-    reversed_model_id = anki_config.get("model_id_reversed", stable_id(f"model:reversed:{plan_id}"))
+    basic_model_id = anki_config.get(
+        "model_id_basic", stable_id(f"model:basic:{plan_id}")
+    )
+    cloze_model_id = anki_config.get(
+        "model_id_cloze", stable_id(f"model:cloze:{plan_id}")
+    )
+    reversed_model_id = anki_config.get(
+        "model_id_reversed", stable_id(f"model:reversed:{plan_id}")
+    )
 
     models = {
         "basic": make_basic_model(basic_model_id),
@@ -212,9 +413,14 @@ def generate_apkg(srs_cards_path: str, output_path: str = None):
 
     # Build all decks
     decks = []
+    visual_count = 0
     for deck_data in data.get("decks", []):
         deck = build_deck(deck_data, models)
         decks.append(deck)
+        # Count visual cards for summary
+        for card in deck_data.get("cards", []):
+            if card.get("image_svg"):
+                visual_count += 1
 
     if not decks:
         print("No decks found in input file.")
@@ -230,7 +436,10 @@ def generate_apkg(srs_cards_path: str, output_path: str = None):
 
     # Summary
     total_cards = sum(len(d.get("cards", [])) for d in data.get("decks", []))
-    print(f"Exported {total_cards} cards across {len(decks)} deck(s) to {output_path}")
+    visual_note = f" ({visual_count} with diagrams)" if visual_count else ""
+    print(
+        f"Exported {total_cards} cards{visual_note} across {len(decks)} deck(s) to {output_path}"
+    )
 
     return output_path
 

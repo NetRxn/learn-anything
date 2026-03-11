@@ -41,6 +41,7 @@ For each task class in the learning plan:
 4. Apply anti-pattern checks: no kitchen sink, no ambiguous cloze, no yes/no, no shopping lists, no pattern matching
 5. Tag each card: component_id, topic_tags (hierarchical with :: separator), bloom_level, knowledge_type, difficulty_estimate, curriculum_position
 6. Set curriculum_position so cards for earlier task classes come first
+7. **Visual audit pass**: After generating all text cards for a task class, review each card and ask: "Does this concept have a spatial, sequential, comparative, or structural dimension that text alone handles poorly?" If yes, add an `image_svg` field with inline SVG and set `image_placement` (`"front"`, `"back"`, or `"both"`). See `references/card-design-guide.md` for the visual heuristic, SVG constraints, and card field format. Not every card needs a visual — only add where a diagram meaningfully aids retrieval.
 
 **Generate the anki_config** once per plan:
 ```python
@@ -183,6 +184,8 @@ For SRS cards specifically, also verify:
 - All five Matuschak principles (focused, precise, consistent, tractable, effortful)
 - No anti-patterns present
 - Component_id and tags are correct
+- Visual audit: cards with spatial/sequential/comparative/structural concepts have `image_svg` where diagrams would aid retrieval
+- Visual quality: SVGs use viewBox, are mobile-legible, have ≤8 labeled elements, use high-contrast colors, and have appropriate `image_placement`
 
 ## Output
 
