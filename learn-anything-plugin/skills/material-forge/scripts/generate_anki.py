@@ -39,7 +39,7 @@ def stable_id(seed: str) -> int:
 
 CARD_CSS = """\
 .card {
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  font-family:  system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
   font-size: 16px;
   line-height: 1.5;
   color: #1a1a1a;
@@ -88,6 +88,7 @@ hr#answer {
 
 # --- Anki Note Models ---
 
+
 def make_basic_model(model_id: int) -> genanki.Model:
     return genanki.Model(
         model_id,
@@ -104,25 +105,27 @@ def make_basic_model(model_id: int) -> genanki.Model:
             {"name": "KnowledgeType"},
             {"name": "Tags"},
         ],
-        templates=[{
-            "name": "Card 1",
-            "qfmt": (
-                '<div class="card">'
-                "{{Front}}"
-                '{{#FrontDiagram}}<div class="card-diagram">{{FrontDiagram}}</div>{{/FrontDiagram}}'
-                "</div>"
-            ),
-            "afmt": (
-                '<div class="card">'
-                "{{Front}}"
-                '{{#FrontDiagram}}<div class="card-diagram">{{FrontDiagram}}</div>{{/FrontDiagram}}'
-                '<hr id="answer">'
-                "{{Back}}"
-                '{{#BackDiagram}}<div class="card-diagram">{{BackDiagram}}</div>{{/BackDiagram}}'
-                '<div class="card-meta">{{BloomLevel}} &middot; {{KnowledgeType}}</div>'
-                "</div>"
-            ),
-        }],
+        templates=[
+            {
+                "name": "Card 1",
+                "qfmt": (
+                    '<div class="card">'
+                    "{{Front}}"
+                    '{{#FrontDiagram}}<div class="card-diagram">{{FrontDiagram}}</div>{{/FrontDiagram}}'
+                    "</div>"
+                ),
+                "afmt": (
+                    '<div class="card">'
+                    "{{Front}}"
+                    '{{#FrontDiagram}}<div class="card-diagram">{{FrontDiagram}}</div>{{/FrontDiagram}}'
+                    '<hr id="answer">'
+                    "{{Back}}"
+                    '{{#BackDiagram}}<div class="card-diagram">{{BackDiagram}}</div>{{/BackDiagram}}'
+                    '<div class="card-meta">{{BloomLevel}} &middot; {{KnowledgeType}}</div>'
+                    "</div>"
+                ),
+            }
+        ],
     )
 
 
@@ -143,24 +146,26 @@ def make_cloze_model(model_id: int) -> genanki.Model:
             {"name": "KnowledgeType"},
             {"name": "Tags"},
         ],
-        templates=[{
-            "name": "Cloze",
-            "qfmt": (
-                '<div class="card">'
-                "{{cloze:Text}}"
-                '{{#FrontDiagram}}<div class="card-diagram">{{FrontDiagram}}</div>{{/FrontDiagram}}'
-                "</div>"
-            ),
-            "afmt": (
-                '<div class="card">'
-                "{{cloze:Text}}"
-                '{{#FrontDiagram}}<div class="card-diagram">{{FrontDiagram}}</div>{{/FrontDiagram}}'
-                "<br>{{Extra}}"
-                '{{#BackDiagram}}<div class="card-diagram">{{BackDiagram}}</div>{{/BackDiagram}}'
-                '<div class="card-meta">{{BloomLevel}} &middot; {{KnowledgeType}}</div>'
-                "</div>"
-            ),
-        }],
+        templates=[
+            {
+                "name": "Cloze",
+                "qfmt": (
+                    '<div class="card">'
+                    "{{cloze:Text}}"
+                    '{{#FrontDiagram}}<div class="card-diagram">{{FrontDiagram}}</div>{{/FrontDiagram}}'
+                    "</div>"
+                ),
+                "afmt": (
+                    '<div class="card">'
+                    "{{cloze:Text}}"
+                    '{{#FrontDiagram}}<div class="card-diagram">{{FrontDiagram}}</div>{{/FrontDiagram}}'
+                    "<br>{{Extra}}"
+                    '{{#BackDiagram}}<div class="card-diagram">{{BackDiagram}}</div>{{/BackDiagram}}'
+                    '<div class="card-meta">{{BloomLevel}} &middot; {{KnowledgeType}}</div>'
+                    "</div>"
+                ),
+            }
+        ],
     )
 
 
@@ -246,7 +251,9 @@ def sanitize_svg(svg: str, card_id: str = "") -> str:
     original = svg
 
     # Remove <script>...</script> elements (including self-closing)
-    svg = re.sub(r"<script[\s>].*?</script\s*>", "", svg, flags=re.DOTALL | re.IGNORECASE)
+    svg = re.sub(
+        r"<script[\s>].*?</script\s*>", "", svg, flags=re.DOTALL | re.IGNORECASE
+    )
     svg = re.sub(r"<script\s*/>", "", svg, flags=re.IGNORECASE)
 
     # Remove on* event handler attributes (onload, onclick, onerror, etc.)
@@ -263,12 +270,18 @@ def sanitize_svg(svg: str, card_id: str = "") -> str:
 
     # Remove <foreignObject> elements (can embed arbitrary HTML/JS)
     svg = re.sub(
-        r"<foreignObject[\s>].*?</foreignObject\s*>", "", svg, flags=re.DOTALL | re.IGNORECASE
+        r"<foreignObject[\s>].*?</foreignObject\s*>",
+        "",
+        svg,
+        flags=re.DOTALL | re.IGNORECASE,
     )
 
     if svg != original:
         label = f" in card {card_id}" if card_id else ""
-        print(f"WARNING: Stripped potentially unsafe content from SVG{label}", file=sys.stderr)
+        print(
+            f"WARNING: Stripped potentially unsafe content from SVG{label}",
+            file=sys.stderr,
+        )
 
     return svg
 
@@ -318,10 +331,10 @@ def build_deck(deck_data: dict, models: dict) -> genanki.Deck:
                 card_id=card_id,
                 model=model,
                 fields=[
-                    card["front"],           # Text (with {{c1::...}} syntax)
-                    card.get("back", ""),     # Extra
-                    front_diagram,            # FrontDiagram
-                    back_diagram,             # BackDiagram
+                    card["front"],  # Text (with {{c1::...}} syntax)
+                    card.get("back", ""),  # Extra
+                    front_diagram,  # FrontDiagram
+                    back_diagram,  # BackDiagram
                     component_id,
                     card_id,
                     bloom,
@@ -382,9 +395,15 @@ def generate_apkg(srs_cards_path: str, output_path: str = None):
 
     # Resolve model IDs — use anki_config if present, otherwise generate deterministically
     anki_config = data.get("anki_config", {})
-    basic_model_id = anki_config.get("model_id_basic", stable_id(f"model:basic:{plan_id}"))
-    cloze_model_id = anki_config.get("model_id_cloze", stable_id(f"model:cloze:{plan_id}"))
-    reversed_model_id = anki_config.get("model_id_reversed", stable_id(f"model:reversed:{plan_id}"))
+    basic_model_id = anki_config.get(
+        "model_id_basic", stable_id(f"model:basic:{plan_id}")
+    )
+    cloze_model_id = anki_config.get(
+        "model_id_cloze", stable_id(f"model:cloze:{plan_id}")
+    )
+    reversed_model_id = anki_config.get(
+        "model_id_reversed", stable_id(f"model:reversed:{plan_id}")
+    )
 
     models = {
         "basic": make_basic_model(basic_model_id),
@@ -418,7 +437,9 @@ def generate_apkg(srs_cards_path: str, output_path: str = None):
     # Summary
     total_cards = sum(len(d.get("cards", [])) for d in data.get("decks", []))
     visual_note = f" ({visual_count} with diagrams)" if visual_count else ""
-    print(f"Exported {total_cards} cards{visual_note} across {len(decks)} deck(s) to {output_path}")
+    print(
+        f"Exported {total_cards} cards{visual_note} across {len(decks)} deck(s) to {output_path}"
+    )
 
     return output_path
 
