@@ -38,35 +38,35 @@ def stable_id(seed: str) -> int:
 # --- Card Styling ---
 
 CARD_CSS = """\
-/* ── Light theme (default) ── */
+/* ── Theme-agnostic styling ──
+   No color or background-color on .card — Anki provides theme-appropriate
+   defaults. Semi-transparent overlays and currentColor adapt to any theme
+   without needing .nightMode/.night_mode overrides. */
 .card {
   font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
   font-size: 16px;
   line-height: 1.5;
-  color: #1a1a1a;
-  background-color: #ffffff;
   max-width: 600px;
   margin: 0 auto;
   padding: 12px;
 }
 .card code {
-  background: #f3f4f6;
-  color: #1a1a1a;
+  background: rgba(128, 128, 128, 0.15);
   padding: 2px 5px;
   border-radius: 3px;
   font-size: 14px;
 }
 .card pre {
-  background: #f3f4f6;
-  color: #1a1a1a;
+  background: rgba(128, 128, 128, 0.15);
   padding: 10px;
   border-radius: 6px;
   overflow-x: auto;
   font-size: 13px;
 }
-.card b, .card strong {
-  color: #111;
-}
+/* ── Diagram "light box" ──
+   SVGs contain hardcoded colors designed for a light background, so the
+   diagram container forces a white background. This is intentional — the
+   diagram is a self-contained visual element, not themed text. */
 .card-diagram {
   text-align: center;
   margin: 14px 0;
@@ -80,53 +80,15 @@ CARD_CSS = """\
 }
 .card-meta {
   font-size: 10px;
-  color: #999;
+  opacity: 0.5;
   margin-top: 14px;
-  border-top: 1px solid #eee;
+  border-top: 1px solid rgba(128, 128, 128, 0.3);
   padding-top: 6px;
 }
 hr#answer {
   border: none;
-  border-top: 1px solid #ddd;
+  border-top: 1px solid rgba(128, 128, 128, 0.3);
   margin: 16px 0;
-}
-
-/* ── Dark / Night theme (Anki desktop + AnkiDroid) ── */
-.nightMode .card,
-.night_mode .card {
-  color: #e0e0e0;
-  background-color: #1e1e1e;
-}
-.nightMode .card code,
-.night_mode .card code {
-  background: #2d2d2d;
-  color: #e0e0e0;
-}
-.nightMode .card pre,
-.night_mode .card pre {
-  background: #2d2d2d;
-  color: #e0e0e0;
-}
-.nightMode .card b,
-.nightMode .card strong,
-.night_mode .card b,
-.night_mode .card strong {
-  color: #f0f0f0;
-}
-.nightMode .card-diagram,
-.night_mode .card-diagram {
-  background: #ffffff;
-  border-radius: 8px;
-  padding: 8px;
-}
-.nightMode .card-meta,
-.night_mode .card-meta {
-  color: #777;
-  border-top-color: #333;
-}
-.nightMode hr#answer,
-.night_mode hr#answer {
-  border-top-color: #444;
 }
 """
 

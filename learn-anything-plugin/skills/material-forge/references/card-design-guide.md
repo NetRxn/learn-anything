@@ -49,11 +49,12 @@ Visual cards use the same `card_type` values (basic, cloze, comparison) but incl
 
 ### SVG Design Constraints
 
-Cards are viewed on phone screens in Anki. All SVGs must:
+Cards are viewed on phone screens in Anki. SVGs render inside a white "light box" container (the `.card-diagram` div), so design SVGs for a white background regardless of the user's Anki theme. All SVGs must:
 
 - Use a viewBox with max logical width of 400 and scale proportionally
-- Use a light background (or transparent) — Anki themes vary
-- Use high-contrast colors: `#2563eb` (blue), `#dc2626` (red), `#16a34a` (green), `#9333ea` (purple), `#d97706` (amber), `#374151` (dark gray for text/lines)
+- Use transparent or no background — the white container handles it
+- Use high-contrast colors against white: `#2563eb` (blue), `#dc2626` (red), `#16a34a` (green), `#9333ea` (purple), `#d97706` (amber), `#374151` (dark gray for text/lines)
+- Never use white or near-white for text or lines (invisible against the container)
 - Keep text at minimum 12px equivalent (legible on mobile)
 - Limit to 8 or fewer labeled elements per diagram (cognitive load)
 - Include a `<title>` element for accessibility
