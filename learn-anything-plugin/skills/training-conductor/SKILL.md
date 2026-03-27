@@ -1,6 +1,6 @@
 ---
 name: training-conductor
-description: "Run interactive teaching sessions with a learner. Use when a learner is ready for a training session — they've been through the assessment/research/calibration/curriculum pipeline and have a learning plan. The Conductor manages session flow (warm-up -> deliberate practice -> integration), adaptive teaching using Socratic questioning and the EMT escalation ladder, real-time difficulty calibration, in-session retrieval probes, mastery gate assessments, knowledge graph updates, external data integration (Anki, self-reports), plateau detection, and motivation management. Sessions are scoped to ~150k tokens. State is read at session start and written at session end."
+description: "This skill should be used when a learner is ready for a training session — they've been through the assessment/research/calibration/curriculum pipeline and have a learning plan, or when the user invokes '/train'. Manages session flow (warm-up, deliberate practice, integration), adaptive teaching using Socratic questioning and the EMT escalation ladder, real-time difficulty calibration, in-session retrieval probes, mastery gate assessments, knowledge graph updates, external data integration (Anki, self-reports), plateau detection, motivation management, instructor persona adoption, and mentor conversation mode. Sessions are scoped to ~150k tokens. State is read at session start and written at session end."
 ---
 
 # Training Conductor

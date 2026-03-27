@@ -1,6 +1,6 @@
 ---
 name: curriculum-architect
-description: "Design a complete, time-bound learning plan from a knowledge graph gap analysis. Use after the Learner Calibrator has produced the gap map. Applies 4C/ID whole-task instruction, Elaboration Theory epitome design, productive failure placement, and a seven-layer motivation architecture to produce a sequenced curriculum with task classes, a dual-timeline schedule, assessment criteria, and plateau protocols. Output is structured JSON conforming to learning-plan.schema.json."
+description: "This skill should be used when the Learner Calibrator has produced the gap map and a learning plan needs designing. Applies 4C/ID whole-task instruction, Elaboration Theory epitome design, productive failure placement, and a seven-layer motivation architecture. Produces a sequenced curriculum with task classes, a dual-timeline schedule, assessment criteria, and plateau protocols. Includes a conversational checkpoint for epitome refinement with the learner. Output is structured JSON conforming to learning-plan.schema.json."
 ---
 
 # Curriculum Architect

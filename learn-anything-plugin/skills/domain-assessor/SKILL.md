@@ -1,6 +1,6 @@
 ---
 name: domain-assessor
-description: "Classify a target skill and build an initial learner profile. Use this skill when a user states a learning goal — any phrase like 'I want to learn X', 'teach me X', 'help me get better at X', or 'how do I learn X'. This is always the first step in the meta-learning pipeline. It classifies the skill type (motor/cognitive/perceptual/social), assesses the learning environment (kind vs. wicked), gathers the learner's relevant background for transfer learning, and produces a constructive approach strategy with both a short-term plan and an extended roadmap. Output is structured JSON conforming to domain-assessment.schema.json."
+description: "This skill should be used when the user states a learning goal — any phrase like 'I want to learn X', 'teach me X', 'help me get better at X', or 'how do I learn X'. Classifies the skill type (motor/cognitive/perceptual/social), assesses the learning environment (kind vs. wicked), gathers the learner's background for transfer learning, and produces a constructive approach strategy. This is always the first step in the meta-learning pipeline. Output is structured JSON conforming to domain-assessment.schema.json."
 ---
 
 # Domain Assessor & Initial Learner Profile

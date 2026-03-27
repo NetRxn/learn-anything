@@ -1,6 +1,6 @@
 ---
 name: skill-researcher
-description: "Deep investigation of a target skill: deconstruction into components, dependency graph construction, frequency/impact analysis, transfer pathway identification, and failure point cataloging. Use this skill after the Domain Assessor has classified the skill and gathered the learner profile. This skill uses web search extensively to ground its decomposition in real expert perspectives rather than relying solely on LLM knowledge. Output is a Skill Research Dossier as structured JSON conforming to skill-dossier.schema.json, with the dependency graph in AGE-compatible vertex/edge format."
+description: "This skill should be used when the user's learning goal has been classified by the Domain Assessor and needs deep investigation. Performs skill deconstruction into components, dependency graph construction, frequency/impact analysis, transfer pathway identification, failure point cataloging, and expert panel discovery. Uses web search extensively to ground decomposition in real expert perspectives. Output is a Skill Research Dossier conforming to skill-dossier.schema.json."
 ---
 
 # Skill Researcher
@@ -63,6 +63,8 @@ For each component, classify:
 - **confidence**: `high`, `medium`, or `low`
 - **verification_needed**: If confidence is `low`, what specifically needs validation?
 - **example**: One concrete real-world example demonstrating this component
+- **cognitive_load_type**: Classify as `intrinsic` (inherent complexity of the component itself), `extraneous` (complexity from how it's presented — should be minimized), or `germane` (productive complexity that builds schema). Most components are intrinsic. Flag any that are primarily germane (learning-to-learn skills) or that risk extraneous load if poorly taught.
+- **assessment_criteria**: Brief description of how mastery of this component can be assessed. Be specific: "Can explain the difference between X and Y" or "Can perform X correctly under Y conditions". This feeds into the Learner Calibrator's question design and Material Forge's assessment instruments.
 
 **Confabulation check:** For EVERY component, provide a specific real-world example. If no example comes to mind, flag the component as potentially confabulated and mark confidence as `low`.
 
@@ -84,6 +86,8 @@ Build the prerequisite and relationship structure:
 **REINFORCEMENT edges** (directed, practicing A strengthens B):
 - Connect components where practice in one genuinely reinforces another
 - Different from prerequisites — A and B may not have a learning dependency, but practicing A improves B
+
+- **cluster_id**: Assign each vertex to a semantic cluster. Group components that naturally belong together (e.g., "foundations", "intermediate-techniques", "advanced-applications"). Use short kebab-case identifiers (e.g., `core-mechanics`, `strategy-layer`, `tooling`). Clusters inform the dashboard visualization and help the Curriculum Architect design task classes.
 
 **Graph quality checks:**
 - Every component should have at least one edge (no orphan nodes)

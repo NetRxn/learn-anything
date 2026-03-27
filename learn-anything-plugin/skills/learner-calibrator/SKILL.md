@@ -1,6 +1,6 @@
 ---
 name: learner-calibrator
-description: "Map a learner's existing knowledge onto a skill dependency graph through adaptive diagnostic assessment. Use after the Skill Researcher has produced a dependency graph. Walks through the graph conversationally, assessing mastery at key nodes using graph propagation and information-theoretic item selection to minimize questions needed. Produces the knowledge graph overlay (the 'gap map') that drives curriculum design. Output is structured JSON conforming to knowledge-graph.schema.json."
+description: "This skill should be used when the Skill Researcher has produced a dependency graph and the learner's existing knowledge needs mapping. Walks through the graph conversationally, assessing mastery at key nodes using graph propagation and information-theoretic item selection to minimize questions needed. Produces the knowledge graph overlay (the 'gap map') that drives curriculum design. Output is structured JSON conforming to knowledge-graph.schema.json."
 ---
 
 # Learner Calibrator

@@ -1,6 +1,6 @@
 ---
 name: material-forge
-description: "Generate all learning materials for a curriculum: Anki flashcard decks, worked examples with fading, productive failure scenarios, interleaved practice sets, reference one-pagers, dependency graph visualizations, assessment instruments, and encoding aids. Use after the Curriculum Architect has produced a learning plan, or on-demand when the Training Conductor needs new materials. All outputs conform to the system's JSON schemas and are exportable to Anki (.apkg), PDF, and Markdown. Quality self-checks are mandatory before presenting any material."
+description: "This skill should be used when the Curriculum Architect has produced a learning plan and learning materials need generating, or on-demand when the Training Conductor needs new materials, or when the user invokes '/materials'. Orchestrates dedicated subagents to generate worked examples with fading, visual materials, SRS flashcard decks, assessment instruments, reference one-pagers, dependency graph visualizations, productive failure scenarios, interleaved practice sets, and encoding aids. All outputs conform to the system's JSON schemas and are exportable to Anki (.apkg), PDF, and Markdown."
 ---
 
 # Material Forge

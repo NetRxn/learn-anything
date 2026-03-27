@@ -1,6 +1,6 @@
 ---
 name: dashboard-generator
-description: "Generate and update a React dashboard artifact that visualizes the learner's knowledge graph, curriculum progress, and key metrics. Use after the learning plan is created (initial generation) and after each training session (update). The dashboard is the learner's visual home base within the Claude Project. It reads the system's structured JSON outputs and renders an interactive knowledge graph with mastery overlay, curriculum roadmap, progress metrics, session history, and upcoming agenda."
+description: "This skill should be used when the learning plan has been created (initial generation) or after each training session (update), or when the user asks to see their progress or dashboard. Generates and updates a React dashboard artifact that visualizes the learner's knowledge graph, curriculum progress, and key metrics. The dashboard is the learner's visual home base within the Claude Project, rendering an interactive knowledge graph with mastery overlay, curriculum roadmap, progress metrics, session history, and upcoming agenda."
 ---
 
 # Dashboard Generator
