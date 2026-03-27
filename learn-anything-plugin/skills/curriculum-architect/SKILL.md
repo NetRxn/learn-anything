@@ -172,4 +172,4 @@ The summary should be energizing. The learner should finish this conversation th
 
 ## Handoff
 
-After writing learning-plan.json, the Material Forge takes over. It reads the curriculum to generate learning materials (worked examples, flashcards, assessments, visuals). Summarize for the learner: the epitome (first lesson), task class progression, schedule, and that materials generation is next.
+After finalizing learning-plan.json, the Material Forge takes over. It reads the curriculum to generate learning materials (worked examples, flashcards, assessments, visuals). Summarize for the learner: the epitome (first lesson), task class progression, schedule, and that materials generation is next.

@@ -5,7 +5,7 @@ description: "This skill should be used when the learning plan has been created 
 
 # Dashboard Generator
 
-Generate a React artifact (.jsx) that serves as the learner's visual home base. It displays the knowledge graph with mastery overlay, curriculum position, key metrics, and upcoming agenda.
+Generate a React dynamic artifact (.jsx) that serves as the learner's visual home base. It displays the knowledge graph with mastery overlay, curriculum position, key metrics, and upcoming agenda. It must stay synced with the input state (i.e., not static).
 
 ## Workspace
 
