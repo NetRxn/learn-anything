@@ -62,7 +62,7 @@ Which skill populates which fields:
 - Natural stopping point: "I've mapped out the skill. Next time we'll assess what you already know and design your curriculum."
 
 **Conversation 2: Calibration + Plan + Materials + Dashboard**
-- Learner Calibrator: diagnostic assessment (~15-20 questions)
+- Learner Calibrator: diagnostic assessment (~15-20 questions) → typically triggers calibration loop (1-2 rounds of targeted re-research)
 - Curriculum Architect: design learning plan (with epitome refinement checkpoint)
 - Material Forge: generate initial materials
 - Dashboard Generator: create progress visualization
@@ -70,12 +70,27 @@ Which skill populates which fields:
 
 ## Calibration Loop
 
-The Learner Calibrator may trigger re-research (max 2 iterations):
-1. Calibrator detects unexpected expertise or gaps that change research priorities
-2. Route back to Skill Researcher for targeted additional research
-3. Researcher updates skill-dossier.json
-4. Route back to Calibrator to re-assess against updated graph
-5. Continue to Curriculum Architect only when Calibrator signals stability
+The Learner Calibrator will typically trigger at least one round of re-research — assessment almost always reveals gaps or surprises the initial research didn't anticipate. Max 2 iterations to prevent indefinite cycling.
+
+1. Calibrator flags re-research triggers (unexpected expertise, gaps in assumed prerequisites, undocumented approaches, low confidence across >30% of vertices)
+2. Route back to Skill Researcher for targeted additional research (not a full re-run)
+3. Researcher updates skill-dossier.json with new/modified vertices
+4. Route back to Calibrator to re-assess only new/changed vertices (preserving existing mastery data)
+5. Continue to Curriculum Architect when Calibrator signals stability (no new triggers)
+
+## Training Conductor Feedback Loops
+
+During ongoing training, the Conductor may signal the need to revisit upstream components:
+
+| Signal | Route To | When |
+|---|---|---|
+| New concepts not in dossier, or field evolved | Skill Researcher (update mode) | Learner encounters undocumented techniques or asks about recent changes |
+| Mastery estimates drifted significantly | Learner Calibrator (targeted) | Observed performance diverges from graph across 3+ sessions, or learner reports significant external learning |
+| Prerequisite gaps or consistent pacing mismatch | Curriculum Architect (update mode) | Pattern across 3+ sessions, not a single bad session |
+| Materials exhausted or wrong format | Material Forge (on-demand) | Via `/materials` or orchestrator routing |
+| Plateau detected, protocols exhausted | Curriculum Architect (re-sequence) | Plateau protocols from the learning plan have been tried without improvement |
+
+These are judgment calls based on accumulated evidence, not automatic triggers.
 
 ## Handoff Protocol
 

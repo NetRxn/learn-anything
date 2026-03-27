@@ -203,4 +203,12 @@ Adapt the teaching approach based on the skill type from the domain assessment:
 
 ## Handoff
 
-At session end, write updated knowledge-graph.json and progress.json. The next invocation of Training Conductor (via /train or orchestrator) will read these files to plan the next session. Summarize for the learner: what was covered, mastery transitions, and the recommended next session focus.
+**Standard (next session):** At session end, write updated knowledge-graph.json and progress.json. The next invocation of Training Conductor (via /train or orchestrator) will read these files to plan the next session. Summarize for the learner: what was covered, mastery transitions, and the recommended next session focus.
+
+**Upstream feedback loops:** Ongoing training may reveal the need to revisit earlier pipeline stages. Signal the orchestrator when:
+- **→ Skill Researcher (re-research):** The learner encounters concepts or approaches not in the dossier, or the field has evolved since the original research. Example: learner asks about a technique the skill graph doesn't cover.
+- **→ Learner Calibrator (re-assessment):** Mastery estimates have drifted significantly from observed performance across multiple sessions, or the learner reports external learning (bootcamp, course, significant practice) that may have changed their knowledge state substantially.
+- **→ Curriculum Architect (re-sequencing):** The current task class sequence isn't working — the learner is consistently hitting prerequisites they don't have, or breezing through content that was expected to be challenging. The plan needs restructuring, not just difficulty adjustment.
+- **→ Material Forge (new materials):** Existing materials are exhausted for a task class, or the learner needs materials in a different format/style than what was generated. Route via `/materials` or signal the orchestrator.
+
+These are not automatic triggers — use judgment based on accumulated session evidence. A single difficult session is not grounds for re-sequencing; a pattern across 3+ sessions is.

@@ -170,7 +170,7 @@ The typical onboarding spans 1-2 conversations:
 
 **Conversation 2 — Calibration, Plan, Materials:**
 5. Route to Learner Calibrator -> diagnostic assessment conversation
-6. (Optional: calibration loop if surprises)
+6. Calibration loop: if the Calibrator flags re-research triggers (which is common on first pass), route to Skill Researcher for targeted updates, then back to Calibrator. Max 2 iterations.
 7. Route to Curriculum Architect -> produces learning plan
 8. Route to Material Forge -> generates all initial materials
 9. Route to Dashboard Generator -> visual progress artifact
@@ -186,7 +186,12 @@ Once in the LEARNING phase:
 1. Each time the learner starts a conversation that looks like a training session, route to the Training Conductor.
 2. The Conductor reads state, runs the session, writes updated state.
 3. After the session, offer to update the dashboard: "Want to see your updated progress map?"
-4. If the Conductor flags issues (plateau detected, materials exhausted, recalibration needed), route appropriately.
+4. If the Conductor flags upstream feedback needs, route to the appropriate component:
+   - **Re-research needed** (new concepts discovered, field evolved) → Skill Researcher in update mode
+   - **Re-calibration needed** (mastery estimates drifted, significant external learning reported) → Learner Calibrator for targeted re-assessment of affected vertices
+   - **Re-sequencing needed** (prerequisite gaps or consistent pacing mismatch across 3+ sessions) → Curriculum Architect in update mode
+   - **Materials needed** (exhausted or wrong format) → Material Forge via on-demand mode or `/materials`
+   - **Plateau detected** → Check plateau protocols in the learning plan; if protocols exhausted, consider re-sequencing
 
 ## Special Requests
 
