@@ -38,6 +38,46 @@ Material Forge operates in two modes:
 
 **On-demand generation** (during training): The Training Conductor requests specific materials for an upcoming session. Generate only what's needed for that session.
 
+## Material Generation Architecture
+
+Material Forge acts as an orchestrator, dispatching dedicated subagents for each material type. Each subagent has its own context window, detailed templates, and QA checks.
+
+### Dispatch Protocol
+
+1. Read the learning plan and knowledge graph
+2. For each task class, determine which material types are needed
+3. Dispatch subagents in priority order (most important first):
+   - **worked-example-generator** — Worked examples with backward fading and detailed visuals (highest priority — these ARE the lessons)
+   - **visual-material-generator** — Concept illustrations, process diagrams, reference visuals
+   - **assessment-generator** — Mastery gate items, delayed retention tests, transfer tasks
+   - **flashcard-generator** — SRS cards per card-design-guide.md
+4. After subagents complete, generate remaining materials directly:
+   - Dependency graph visualization (Mermaid — the one place Mermaid is appropriate)
+   - Interleaved practice sets
+   - Productive failure scenarios
+   - Encoding aids
+   - Reference one-pagers
+   - External resource lists
+
+### Subagent Context
+
+Each subagent receives:
+- The relevant task class data from learning-plan.json
+- Vertex details from knowledge-graph.json for the task class's vertices
+- Learner context: teaching_preferences (from domain-assessment.json), related experience, constraints
+- The applicable quality rubric section from references/quality-rubrics.md
+
+### Per-Subagent QA
+
+Each subagent runs its own quality check before returning results. Material Forge aggregates all outputs and does a final cross-check for:
+- Completeness: all material types generated for all applicable task classes
+- Consistency: terminology, vertex references, and difficulty levels align across materials
+- Color contrast: spot-check SVG outputs against mandatory color rules
+
+### Completeness Tracking
+
+After all subagents complete, verify all material types were generated for all applicable task classes. List any gaps and report to the user. Offer to regenerate missing materials via `/materials`.
+
 ## Material Generation Process
 
 ### 1. SRS Flashcard Decks
