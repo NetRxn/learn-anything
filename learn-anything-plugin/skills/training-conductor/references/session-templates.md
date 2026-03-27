@@ -102,3 +102,47 @@ After a correct response at ANY level -> RESET to Pump for the next topic.
 - Max 3 assessment attempts before flagging for curriculum adjustment
 
 **Anti-gaming:** Vary surface features on each attempt. Require explanation. Schedule delayed retention check after passing.
+
+## Template F: Mentor Conversation (~8,000 tokens)
+
+**Purpose:** Relaxed, exploratory discussion following learner interest. Invisible passive assessment.
+
+**When to use:** User requests "let's just talk about [topic]", "mentor mode", "exploration mode", or invokes `/train --mode mentor`. Also appropriate when the learner seems burned out on structured sessions or wants to explore tangentially.
+
+**Phase structure:**
+
+### Opening (5%)
+- "What's on your mind about [skill]?" or follow up on something from the last session
+- No retrieval probes — this is not an assessment opening
+- If instructor_persona is set, this should feel like settling into a conversation with that person
+
+### Exploration (80%)
+- Follow the learner's curiosity wherever it leads
+- Use the dependency graph internally to identify when the conversation touches on assessable vertices, but DO NOT turn it into a quiz
+- Ask genuine follow-up questions that deepen understanding: "What makes you think that?", "How does that connect to [related concept]?", "Have you seen that come up in your own work?"
+- Gently steer toward adjacent topics that connect to curriculum gaps when natural opportunities arise, but never force a topic change
+- Share relevant stories, analogies, and thought experiments in the persona's style
+- If the learner asks a direct question, answer it fully — this is not a Socratic session
+
+### Passive Assessment (invisible, throughout)
+- When the learner demonstrates understanding of a vertex during natural conversation, note it internally
+- When misconceptions surface, address them naturally within the conversation flow — do not flag them as "misconception detected"
+- Track which vertices were touched and the quality of the learner's engagement with each
+
+### Closing (15%)
+- Brief synthesis: "We covered some interesting ground today — [summary of topics explored]"
+- Note any insights: "I noticed you have a strong intuition about [X] — that's going to serve you well when we get to [Y]"
+- If misconceptions were observed, plant seeds for correction without being heavy-handed: "One thing worth thinking about before next time is [gentle reframe]"
+- Preview what's coming: "When you're ready for a focused session, we could dig into [curriculum gap that connects to today's discussion]"
+
+### Assessment Protocol (session end)
+- Update knowledge graph vertices that were naturally touched during conversation
+- Use `evidence_source: "mentor_conversation"` to distinguish from formal assessment
+- Apply 0.6x confidence weight compared to direct assessment (informal observations carry less certainty)
+- For misconceptions observed but not fully corrected, flag the vertex for revisiting in the next structured session
+
+### Key Principles
+- The learner should never feel like they are being assessed during this mode
+- This mode should feel most natural when an instructor_persona is set — like having coffee with the mentor
+- Passive assessment stays invisible unless the learner explicitly asks "how am I doing?"
+- A good teacher forms impressions during casual conversation — useful signal, but lower confidence than formal assessment
