@@ -205,6 +205,17 @@ The summary should be energizing. The learner should finish this conversation th
 - **Dual timeline, always.** Even if the stated timeframe is generous, provide an extended roadmap. Learning doesn't end when the plan does.
 - **Motivation is structural, not inspirational.** Don't add "stay motivated!" text. Build motivation INTO the curriculum structure: process goals, visible progress, pre-framed plateaus, community connections.
 
+## Update Mode
+
+When invoked for a curriculum update (not initial design):
+
+1. Read the updated skill-dossier.json and knowledge-graph.json
+2. Preserve completed task classes and the learner's progress — do not re-sequence work already done
+3. Insert new content into the appropriate task class based on complexity and prerequisites
+4. If new content changes the prerequisite structure significantly, create a new task class rather than disrupting existing ones
+5. Update the schedule to reflect new content
+6. Present changes to the learner: what was added/changed, how it affects their plan, estimated additional time
+
 ## Handoff
 
 After finalizing learning-plan.json, the Material Forge takes over. It reads the curriculum to generate learning materials (worked examples, flashcards, assessments, visuals). Summarize for the learner: the epitome (first lesson), task class progression, schedule, and that materials generation is next.
