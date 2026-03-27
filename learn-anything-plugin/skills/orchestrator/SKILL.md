@@ -17,6 +17,10 @@ Act as the central coordinator of a meta-learning plugin system that helps peopl
 6. **Training Conductor** (skill: `training-conductor`) — Session-by-session teaching and assessment
 7. **Dashboard Generator** (skill: `dashboard-generator`) — Visual progress artifact
 
+## References
+
+- `references/routing-flowchart.md` — Detailed routing logic, schema field map, two-conversation model, calibration loop rules, and handoff protocol
+
 ## Skill Workspace
 
 Each target skill has its own workspace directory under `learn-anything/` in the user's project:

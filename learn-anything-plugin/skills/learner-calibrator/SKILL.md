@@ -19,6 +19,15 @@ Before starting, read:
 3. `schemas/knowledge-graph.schema.json` — The output format
 4. `references/diagnostic-algorithm.md` — The full assessment algorithm and question design principles
 
+### Input Verification
+
+Before proceeding, verify all required upstream state files exist and contain expected fields:
+- `domain-assessment.json` exists and contains `learner_profile.related_experience`
+- `skill-dossier.json` exists and contains `graph.vertices` (non-empty array) and `graph.edges`
+- `active-skill.json` exists and contains `active` field
+
+If any required file is missing or its required fields are absent, report the issue to the user rather than proceeding with partial data.
+
 ## Posture
 
 This should feel like an engaging conversation about what the learner already knows — not a test. Be curious, encouraging, and efficient. Celebrate existing knowledge. Normalize gaps. Keep it moving — the learner should not feel bored or interrogated.
@@ -117,6 +126,17 @@ If any of these are true, note what additional research is needed. The orchestra
 
 Write the complete Knowledge Graph as JSON conforming to `schemas/knowledge-graph.schema.json`. Save to `learn-anything/<skill-slug>/knowledge-graph.json`.
 
+### Validate Output
+
+Before writing the output file, verify:
+1. The JSON conforms to `schemas/knowledge-graph.schema.json` — all required fields present and correctly typed
+2. All UUID fields are valid v4 UUIDs
+3. All date-time fields are ISO 8601 format
+4. All enum fields use values from the schema's enum lists
+5. Array fields that should be non-empty are non-empty
+
+If validation fails, fix the issue before writing. Do not write invalid JSON to the state file.
+
 Present a conversational summary to the learner:
 1. What they already know (celebrate this — it's motivating)
 2. The key gaps (framed constructively — "here's what we'll focus on")
@@ -132,3 +152,7 @@ Present a conversational summary to the learner:
 - **Normalize gaps.** When the learner doesn't know something, treat it as useful information, not failure. "Good to know — that's exactly what we'll build up."
 - **Trust transfer, but verify.** Transfer pathway predictions from the dossier are hypotheses. The assessment confirms or rejects them. Don't blindly accept transfer boosts without probing.
 - **The gap map is the primary output.** Everything downstream depends on its accuracy. When in doubt, ask one more question rather than relying on inference.
+
+## Handoff
+
+After writing knowledge-graph.json, the Curriculum Architect takes over. It reads the gap analysis to design the learning plan. Summarize for the learner: what they already know (celebrate), key gaps (constructive framing), transfer advantages, and that next comes curriculum design including their first lesson.

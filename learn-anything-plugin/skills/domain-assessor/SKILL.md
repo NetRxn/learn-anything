@@ -19,6 +19,17 @@ Be constructive, not cautionary. Never lecture about limitations. For every goal
 
 The learner should leave this conversation feeling energized and clear about their path, not warned about difficulty.
 
+### Inputs
+
+- `references/classification-guide.md` — Decision trees for skill type, environment, and Bloom's ceiling classification
+
+### Input Verification
+
+Before proceeding, verify all required upstream state files exist and contain expected fields:
+- `active-skill.json` exists if resuming (contains `active` field), OR this is a new skill (directory will be created)
+
+If any required file is missing or its required fields are absent, report the issue to the user rather than proceeding with partial data.
+
 ## Process
 
 Run this as a structured conversation. Don't dump all questions at once — be conversational, build on what the learner shares.
@@ -107,6 +118,17 @@ Write the complete Domain Assessment Profile as structured JSON conforming to `s
 
 Save the JSON to `learn-anything/<skill-slug>/domain-assessment.json`.
 
+### Validate Output
+
+Before writing the output file, verify:
+1. The JSON conforms to `schemas/domain-assessment.schema.json` — all required fields present and correctly typed
+2. All UUID fields are valid v4 UUIDs
+3. All date-time fields are ISO 8601 format
+4. All enum fields use values from the schema's enum lists
+5. Array fields that should be non-empty are non-empty
+
+If validation fails, fix the issue before writing. Do not write invalid JSON to the state file.
+
 Present a conversational summary to the learner covering:
 1. How the skill has been classified and what that means for the approach
 2. Their short-term plan (specific, energizing)
@@ -121,3 +143,7 @@ Present a conversational summary to the learner covering:
 - Always gather related experience — this is the foundation for transfer learning and dramatically affects curriculum scope.
 - Be specific in the short-term plan. "You'll learn a lot" is useless. "You'll be able to hold a conversation about daily topics, order food, and navigate a city in Spanish" is actionable.
 - The identity frame should feel natural, not forced. If the learner's purpose is deeply practical ("I need to pass a certification"), the identity frame should match ("You're becoming a certified X") rather than being aspirationally disconnected.
+
+## Handoff
+
+After writing domain-assessment.json, the Skill Researcher takes over. It reads the classification and learner profile to guide its decomposition research. Summarize for the learner: what was classified, the short-term plan, and that next comes skill research (which may involve web searches and take some time).

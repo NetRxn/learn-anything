@@ -18,6 +18,14 @@ Before starting, read:
 2. `schemas/skill-dossier.schema.json` — The required output format
 3. `references/expert-interview-protocol.md` — The Ferriss interview questions and deconstruction techniques
 
+### Input Verification
+
+Before proceeding, verify all required upstream state files exist and contain expected fields:
+- `domain-assessment.json` exists and contains `skill_classification.target_skill` and `learner_profile`
+- `active-skill.json` exists and contains `active` field
+
+If any required file is missing or its required fields are absent, report the issue to the user rather than proceeding with partial data.
+
 ## Process
 
 ### Step 1: Landscape Mapping
@@ -129,6 +137,17 @@ From the expert interviews and landscape mapping, catalog:
 
 Write the complete Skill Research Dossier as JSON conforming to `schemas/skill-dossier.schema.json`. Verify every required field is present. Save to `learn-anything/<skill-slug>/skill-dossier.json`.
 
+### Validate Output
+
+Before writing the output file, verify:
+1. The JSON conforms to `schemas/skill-dossier.schema.json` — all required fields present and correctly typed
+2. All UUID fields are valid v4 UUIDs
+3. All date-time fields are ISO 8601 format
+4. All enum fields use values from the schema's enum lists
+5. Array fields that should be non-empty are non-empty
+
+If validation fails, fix the issue before writing. Do not write invalid JSON to the state file.
+
 Present a conversational summary to the learner covering:
 1. The major component clusters identified (using plain language, not vertex IDs)
 2. The most important components (gateway nodes + high-frequency/high-impact)
@@ -144,3 +163,7 @@ Present a conversational summary to the learner covering:
 - **Transfer pathways are a first-class output.** The learner profile exists specifically to identify where existing knowledge accelerates learning. Do not skip this step.
 - **The graph structure matters more than individual descriptions.** Getting the prerequisite relationships right is more important than having perfect descriptions. An incorrect prerequisite edge will cause the Curriculum Architect to sequence things wrong.
 - **Research sources must be recorded.** Include the URLs and types of sources consulted. This enables future expert validation and shows the learner what the decomposition is based on.
+
+## Handoff
+
+After writing skill-dossier.json, the Learner Calibrator takes over. It reads the dependency graph and transfer pathways to design a diagnostic assessment. Summarize for the learner: the major component clusters found, key transfer pathways from their experience, and that next comes a conversational assessment of what they already know.

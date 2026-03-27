@@ -30,6 +30,16 @@ Read these as needed (not all at once — load the relevant one for the session 
 - `references/difficulty-calibration.md` — ZPD targeting, observable signals, adjustment levers
 - `references/assessment-types.md` — Four assessment types, scoring, knowledge graph updates, multi-source fusion
 
+### Input Verification
+
+Before proceeding, verify all required upstream state files exist and contain expected fields:
+- `learning-plan.json` exists and contains `curriculum` and `schedule`
+- `knowledge-graph.json` exists and contains `graph.vertices` with `learner_state` properties
+- `active-skill.json` exists and contains `active` field
+- `progress.json` may or may not exist (first session vs. subsequent)
+
+If any required file is missing or its required fields are absent, report the issue to the user rather than proceeding with partial data.
+
 ## Session Loading Protocol
 
 At the start of EVERY session:
@@ -92,6 +102,17 @@ Adjustment levers: scaffolding level, interleaving intensity, Bloom's level of q
 3. **Identity reinforcement**: Brief, natural connection to the identity frame. "Nice work — you're thinking like a [identity] now."
 4. **Preview next session**: What we'll work on next and why
 5. **Process goal reminder**: What to practice between sessions (if applicable)
+
+### Validate Output
+
+Before writing the output files, verify:
+1. The JSON conforms to `schemas/progress.schema.json` (and `schemas/knowledge-graph.schema.json` for graph updates) — all required fields present and correctly typed
+2. All UUID fields are valid v4 UUIDs
+3. All date-time fields are ISO 8601 format
+4. All enum fields use values from the schema's enum lists
+5. Array fields that should be non-empty are non-empty
+
+If validation fails, fix the issue before writing. Do not write invalid JSON to the state file.
 
 ## Knowledge Graph Updates
 
@@ -179,3 +200,7 @@ Adapt the teaching approach based on the skill type from the domain assessment:
 **Perceptual skills**: Structure real-world exercises (tasting, listening, viewing) and debrief experiences. Build categorical vocabulary alongside sensory exposure. Watch for verbal overshadowing — vocabulary without corresponding experience can actually hurt.
 
 **Social skills**: AI role-play with coaching pauses. Play a character, let the learner practice, then pause for structured debrief. Alternate between learner perspective and observer perspective.
+
+## Handoff
+
+At session end, write updated knowledge-graph.json and progress.json. The next invocation of Training Conductor (via /train or orchestrator) will read these files to plan the next session. Summarize for the learner: what was covered, mastery transitions, and the recommended next session focus.

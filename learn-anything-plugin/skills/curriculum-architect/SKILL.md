@@ -20,6 +20,15 @@ Before starting, read:
 4. `references/4cid-encoding.md` — Curriculum generation rules (4C/ID, Elaboration Theory, Productive Failure, interleaving, spacing, mastery gates)
 5. `references/motivation-architecture.md` — Seven-layer motivation system
 
+### Input Verification
+
+Before proceeding, verify all required upstream state files exist and contain expected fields:
+- `knowledge-graph.json` exists and contains `graph.vertices` (non-empty array) and `gap_analysis`
+- `domain-assessment.json` exists and contains `learner_profile.constraints` and `approach_strategy`
+- `active-skill.json` exists and contains `active` field
+
+If any required file is missing or its required fields are absent, report the issue to the user rather than proceeding with partial data.
+
 ## Process
 
 ### Step 1: Selection — What to Teach
@@ -130,6 +139,17 @@ Follow `references/motivation-architecture.md` to build all seven layers:
 
 Write the complete Learning Plan as JSON conforming to `schemas/learning-plan.schema.json`. Save to `learn-anything/<skill-slug>/learning-plan.json`.
 
+### Validate Output
+
+Before writing the output file, verify:
+1. The JSON conforms to `schemas/learning-plan.schema.json` — all required fields present and correctly typed
+2. All UUID fields are valid v4 UUIDs
+3. All date-time fields are ISO 8601 format
+4. All enum fields use values from the schema's enum lists
+5. Array fields that should be non-empty are non-empty
+
+If validation fails, fix the issue before writing. Do not write invalid JSON to the state file.
+
 Present a conversational summary to the learner:
 1. The epitome — what they'll do first and why
 2. The task class progression — a high-level roadmap of complexity levels
@@ -149,3 +169,7 @@ The summary should be energizing. The learner should finish this conversation th
 - **The schedule must be realistic.** Check it against the learner's stated constraints. If the curriculum doesn't fit the timeframe at the learner's available hours, adjust scope — don't pretend it fits.
 - **Dual timeline, always.** Even if the stated timeframe is generous, provide an extended roadmap. Learning doesn't end when the plan does.
 - **Motivation is structural, not inspirational.** Don't add "stay motivated!" text. Build motivation INTO the curriculum structure: process goals, visible progress, pre-framed plateaus, community connections.
+
+## Handoff
+
+After writing learning-plan.json, the Material Forge takes over. It reads the curriculum to generate learning materials (worked examples, flashcards, assessments, visuals). Summarize for the learner: the epitome (first lesson), task class progression, schedule, and that materials generation is next.

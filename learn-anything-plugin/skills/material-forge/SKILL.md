@@ -21,6 +21,15 @@ Before starting, read:
 5. `references/quality-rubrics.md` — Quality checks for all material types
 6. `../training-conductor/references/session-templates.md` — Session templates (for designing template-aligned materials)
 
+### Input Verification
+
+Before proceeding, verify all required upstream state files exist and contain expected fields:
+- `learning-plan.json` exists and contains `curriculum.task_classes` (non-empty array)
+- `knowledge-graph.json` exists and contains `graph.vertices`
+- `active-skill.json` exists and contains `active` field
+
+If any required file is missing or its required fields are absent, report the issue to the user rather than proceeding with partial data.
+
 ## Generation Modes
 
 Material Forge operates in two modes:
@@ -187,6 +196,17 @@ For SRS cards specifically, also verify:
 - Visual audit: cards with spatial/sequential/comparative/structural concepts have `image_svg` where diagrams would aid retrieval
 - Visual quality: SVGs use viewBox, are mobile-legible, have ≤8 labeled elements, use high-contrast colors, and have appropriate `image_placement`
 
+### Validate Output
+
+Before writing the output file, verify:
+1. The JSON conforms to `schemas/srs-cards.schema.json` — all required fields present and correctly typed
+2. All UUID fields are valid v4 UUIDs
+3. All date-time fields are ISO 8601 format
+4. All enum fields use values from the schema's enum lists
+5. Array fields that should be non-empty are non-empty
+
+If validation fails, fix the issue before writing. Do not write invalid JSON to the state file.
+
 ## Output
 
 Save all materials to the skill workspace (`learn-anything/<skill-slug>/`):
@@ -206,3 +226,7 @@ Present a summary to the learner:
 3. The dependency graph visualization (their knowledge map)
 4. Any reference materials for immediate use
 5. What materials will be generated on-demand during training sessions
+
+## Handoff
+
+After writing srs-cards.json and materials/, the Dashboard Generator creates the progress visualization, then the system transitions to the LEARNING phase. Summarize for the learner: what materials were generated, how to import the Anki deck, and that training sessions are ready to begin.

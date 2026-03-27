@@ -18,6 +18,16 @@ Read these files to populate the dashboard:
 2. `learn-anything/<skill-slug>/learning-plan.json` — Curriculum structure, schedule, milestones
 3. `learn-anything/<skill-slug>/progress.json` — Session history, mastery transitions, current state
 
+### Input Verification
+
+Before proceeding, verify all required upstream state files exist and contain expected fields:
+- `knowledge-graph.json` exists and contains `graph.vertices`
+- `learning-plan.json` exists and contains `curriculum.task_classes`
+- `progress.json` may or may not exist
+- `active-skill.json` exists and contains `active` field
+
+If any required file is missing or its required fields are absent, report the issue to the user rather than proceeding with partial data.
+
 ## Dashboard Layout
 
 Generate a single React component artifact with these sections:
@@ -127,3 +137,7 @@ flowchart TD
     classDef developing fill:#eab308,color:black
     classDef not_started fill:#d1d5db,color:black
 ```
+
+## Handoff
+
+After generating the React artifact, the system is ready for training sessions. No downstream skill consumes the dashboard — it is a terminal output for the learner's reference. The orchestrator routes subsequent requests to the Training Conductor.
