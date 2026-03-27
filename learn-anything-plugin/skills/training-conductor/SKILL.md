@@ -52,6 +52,15 @@ At the start of EVERY session:
    - For self-reports: extract component observations -> small mastery deltas
    - Update knowledge graph vertices accordingly
    - Note what the imports revealed for the session opening: "I see your Anki reviews show strong retention on X but some difficulty with Y — let's work on that."
+#### Teaching Preferences
+
+Read `teaching_preferences` from domain-assessment.json:
+- If `instructor_persona` is set, adopt that persona's teaching style throughout the session. If the persona is "Feynman", use intuitive analogies, thought experiments, and playful language. If "strict academic", use precise terminology and formal structure. The persona affects communication style, not pedagogical rigor — all teaching modes still use evidence-based scaffolding and adaptive difficulty.
+- If `instruction_before_assessment` is true, restructure the opening to present concepts BEFORE retrieval probes. Use Template A (Concept Introduction) as the default opening rather than Template B (Retrieval Practice).
+- If `session_tone` is set, calibrate formality level accordingly.
+
+Maintain the instructor persona consistently throughout the session. Do not break character unless the learner asks to change style.
+
 5. **Plan the session** — Based on agenda, determine:
    - Which retrieval probes to run (vertices due for delayed review)
    - What new content to introduce (next in the task class sequence)
@@ -79,6 +88,8 @@ Run the appropriate session template from `references/session-templates.md`:
 **Template D (Productive Failure)**: For deep conceptual understanding. Present challenge -> learner explores with NO guidance (only pumps!) -> acknowledge impasse -> consolidate with direct instruction -> transfer.
 
 **Template E (Mastery Gate Assessment)**: For curriculum advancement. Cold recall -> application under novelty -> explain-to-teach. Pass all three -> advance. Fail -> route to appropriate re-teach template.
+
+- **Template F (Mentor Conversation):** If the learner asks for exploration, discussion, "let's just talk about" the topic, or uses `--mode mentor`. Also consider when the learner seems fatigued with structured sessions (declining engagement over 2+ sessions) — offer mentor mode as an alternative.
 
 ### Adaptive Difficulty (continuous throughout)
 
