@@ -9,7 +9,9 @@ The system is domain-agnostic: Spanish, guitar, negotiation, programming, pharma
 | Command | Purpose |
 |---|---|
 | `/learn [topic or context]` | Primary interface — start, resume, or manage any skill |
-| `/train [context]` | Jump straight into a training session |
+| `/train [context or --mode mentor]` | Jump straight into a training session |
+| `/materials [type] [task-class]` | Generate or regenerate learning materials *(v2.0)* |
+| `/update [what changed]` | Update curriculum for evolving fields *(v2.0)* |
 
 `/learn` delegates to the orchestrator, which handles everything: new skills, resuming, switching, progress checks, material generation, imports, and plan updates. Just describe what you want naturally — `/learn Spanish`, `/learn progress`, `/learn I'm stuck on chord transitions`.
 
@@ -38,8 +40,21 @@ Learning (ongoing, session-by-session):
 
   Training Conductor
   (Socratic teaching, adaptive difficulty, mastery gates,
-   spaced retrieval, plateau detection, progress tracking)
+   spaced retrieval, plateau detection, progress tracking,
+   instructor personas, mentor conversation mode)
 ```
+
+## What's New in v2.0
+
+- **Conversational epitome refinement** — The Curriculum Architect pauses to discuss the first lesson before building the full plan
+- **Instructor personas** — Choose a teaching style inspired by masters of the field (e.g., Feynman for physics)
+- **Mentor conversation mode** — Relaxed, exploratory discussions via `/train --mode mentor`
+- **Session transcripts** — Full session logs saved to `transcripts/` for review
+- **Curriculum updates** — `/update` command for evolving fields
+- **Material generation** — `/materials` command for on-demand content with dedicated subagents
+- **Improved research** — Ferriss interview protocol now mandatory, freshness detection for cutting-edge fields
+- **Better visuals** — WCAG-compliant color contrast, inline SVG over Mermaid for learning materials
+- **Expert panel** — Skill Researcher identifies masters of the field for persona selection
 
 ## Skills
 
