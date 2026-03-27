@@ -52,6 +52,22 @@ For each task class in the learning plan:
 6. Set curriculum_position so cards for earlier task classes come first
 7. **Visual audit pass**: After generating all text cards for a task class, review each card and ask: "Does this concept have a spatial, sequential, comparative, or structural dimension that text alone handles poorly?" If yes, add an `image_svg` field with inline SVG and set `image_placement` (`"front"`, `"back"`, or `"both"`). See `references/card-design-guide.md` for the visual heuristic, SVG constraints, and card field format. Not every card needs a visual — only add where a diagram meaningfully aids retrieval.
 
+#### Color Contrast Enforcement
+
+Before finalizing any SVG, run this check:
+- Verify all text elements use colors darker than #6b7280 (minimum dark gray)
+- Verify all line/stroke elements use colors from the approved high-contrast palette (#2563eb, #dc2626, #16a34a, #9333ea, #d97706, #374151)
+- Verify no fill color is used as the sole visual indicator without accompanying stroke or text
+- Light-on-light rendering is a critical defect — reject and regenerate any diagram that fails this check
+
+Refer to `references/card-design-guide.md` for the complete color rules.
+
+#### Visual Format Selection
+
+- **Mermaid:** ONLY for dependency graph visualizations and curriculum roadmap overviews
+- **Inline SVG:** For ALL flashcard diagrams, worked example illustrations, reference material visuals, and concept diagrams
+- When a visual is needed for a flashcard (per the visual audit pass), generate inline SVG with the `image_svg` field. Do NOT substitute a Mermaid code block — Mermaid renders generically and cannot enforce the color contrast rules required for learning materials.
+
 **Generate the anki_config** once per plan:
 ```python
 import random
