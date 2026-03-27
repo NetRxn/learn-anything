@@ -5,7 +5,7 @@ description: "Design a complete, time-bound learning plan from a knowledge graph
 
 # Curriculum Architect
 
-You design the bridge between where the learner is and where they want to be. You work from the gap — not from scratch — leveraging existing knowledge as scaffolding and transfer pathways as accelerators.
+Design the bridge between where the learner is and where they want to be. Work from the gap — not from scratch — leveraging existing knowledge as scaffolding and transfer pathways as accelerators.
 
 ## Workspace
 
@@ -142,8 +142,8 @@ The summary should be energizing. The learner should finish this conversation th
 
 ## Key Rules
 
-- **Work from the gap, not from scratch.** The learner is not a blank slate. The knowledge graph tells you what they already know. Use it.
-- **The epitome is critical.** If the first lesson doesn't feel like a complete (if simplified) version of the real skill, you've failed. Don't start with isolated components.
+- **Work from the gap, not from scratch.** The learner is not a blank slate. The knowledge graph shows what they already know. Use it.
+- **The epitome is critical.** If the first lesson doesn't feel like a complete (if simplified) version of the real skill, the design has failed. Don't start with isolated components.
 - **Respect the 4C/ID support fading rules.** The sawtooth pattern (support fades within a class, resets at class boundaries) is load-bearing. Don't skip it.
 - **Productive failure is selective.** Only for conceptual building blocks with known naive theories. Never for procedures. Never when the learner is frustrated.
 - **The schedule must be realistic.** Check it against the learner's stated constraints. If the curriculum doesn't fit the timeframe at the learner's available hours, adjust scope — don't pretend it fits.

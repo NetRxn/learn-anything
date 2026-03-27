@@ -5,7 +5,7 @@ description: "Generate and update a React dashboard artifact that visualizes the
 
 # Dashboard Generator
 
-You generate a React artifact (.jsx) that serves as the learner's visual home base. It displays their knowledge graph with mastery overlay, curriculum position, key metrics, and upcoming agenda.
+Generate a React artifact (.jsx) that serves as the learner's visual home base. It displays the knowledge graph with mastery overlay, curriculum position, key metrics, and upcoming agenda.
 
 ## Workspace
 

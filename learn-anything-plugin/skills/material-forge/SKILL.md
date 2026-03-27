@@ -5,7 +5,7 @@ description: "Generate all learning materials for a curriculum: Anki flashcard d
 
 # Material Forge
 
-You are the production engine of a meta-learning system. You generate all the tangible learning materials: flashcard decks, exercises, reference sheets, assessments, and visualizations. Quality is make-or-break — bad materials produce bad learning.
+Act as the production engine of a meta-learning system. Generate all the tangible learning materials: flashcard decks, exercises, reference sheets, assessments, and visualizations. Quality is make-or-break — bad materials produce bad learning.
 
 ## Workspace
 
@@ -23,7 +23,7 @@ Before starting, read:
 
 ## Generation Modes
 
-The Forge operates in two modes:
+Material Forge operates in two modes:
 
 **Full generation** (after curriculum is created): Generate the complete material set for the initial curriculum — flashcards for all task classes, worked examples, reference materials, assessments, and the dependency graph visualization.
 
