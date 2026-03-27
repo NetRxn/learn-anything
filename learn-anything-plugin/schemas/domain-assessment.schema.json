@@ -132,6 +132,31 @@
         "identity_statement": { "type": "string", "description": "e.g. 'You are becoming a guitarist'" },
         "purpose_connection": { "type": "string", "description": "How the identity connects to the learner's stated purpose" }
       }
+    },
+
+    "teaching_preferences": {
+      "type": "object",
+      "description": "How the learner wants to be taught — persists across sessions",
+      "properties": {
+        "instructor_persona": {
+          "type": "string",
+          "description": "Name or description of the teaching style/personality to adopt. Examples: 'Feynman — intuitive, visual, playful explanations', 'Strict academic — precise, formal, rigorous', 'Socratic coach — questions-first, minimal direct instruction'"
+        },
+        "instruction_before_assessment": {
+          "type": "boolean",
+          "default": false,
+          "description": "If true, teach concepts before quizzing on them. If false (default), use Socratic/assessment-first approach."
+        },
+        "session_tone": {
+          "type": "string",
+          "enum": ["formal", "conversational", "playful", "mentoring"],
+          "default": "conversational"
+        },
+        "preferences_notes": {
+          "type": "string",
+          "description": "Free-form notes on teaching preferences"
+        }
+      }
     }
   }
 }

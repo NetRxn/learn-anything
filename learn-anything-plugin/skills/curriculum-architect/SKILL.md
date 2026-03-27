@@ -47,18 +47,53 @@ Start from the `gap_analysis.priority_gaps` in the knowledge graph. These are al
 
 **Produce a ranked list** with: vertex_id, priority_rank, selection_score, rationale, and excluded (boolean with reason if excluded).
 
+### Step 1b: Present Expert Panel and Gather Teaching Preferences
+
+If `skill-dossier.json` contains an `expert_panel` array with entries:
+- Present the panel to the learner: "The research identified these masters of [field]: [list names with teaching styles]. You can choose none, one, or several as your virtual panel of experts. Your instructor will adopt their teaching approach during sessions."
+- Record the learner's choice in domain-assessment.json under `teaching_preferences.instructor_persona`
+
+If `expert_panel` is empty or absent:
+- Ask the learner directly: "Do you have a favorite teacher, author, or mentor whose style resonates with you? If not, what tone works best — formal and precise, casual and conversational, or playful and exploratory?"
+
+If the learner has no preference:
+- Default to a generic expert teacher persona for the domain
+
+Also ask about instruction style:
+- "Would you prefer to be taught concepts first, then tested on them? Or would you rather be challenged with questions and discover concepts through discussion?"
+- Record in `teaching_preferences.instruction_before_assessment`
+
+Write the updated `teaching_preferences` to domain-assessment.json.
+
 ### Step 2: Sequencing — What Order
 
 Follow the rules from `references/4cid-encoding.md` precisely.
 
-**2a. Design the Epitome**
-The first lesson must be a simplified but complete version of the entire skill. Rules:
-- Must be a real, authentic task
-- Must exercise the core loop of the skill
-- Must produce a meaningful output
-- If the learner has existing knowledge, use it to make the epitome more sophisticated
+### Step 2a: Design and Refine the Epitome
 
-Identify which vertex_ids the epitome covers. Describe how it leverages existing knowledge.
+#### 2a-i. Draft Epitome Internally
+
+Design the epitome following the rules in `references/4cid-encoding.md`: a simplified but complete first lesson that exercises the full skill loop at reduced complexity. If the skill allows multiple valid starting points, identify 2-3 candidate epitome designs.
+
+The epitome should:
+- Connect directly to the learner's stated goals and purpose (from domain-assessment.json)
+- Leverage the learner's existing knowledge (from knowledge-graph.json transfer_leverage)
+- Produce a meaningful, tangible output the learner can point to after the first session
+
+#### 2a-ii. Present and Refine with the Learner (CONVERSATIONAL CHECKPOINT)
+
+Present the proposed epitome to the learner with clear reasoning:
+- "Based on your goals and what the research found, here's what I'd suggest for your first lesson: [epitome description]"
+- Explain WHY this epitome was chosen: what makes it representative, how it connects to the learner's stated goals, what they'll be able to do after completing it
+- Explicitly ask: "Does this feel like the right starting point? Is there something more important to you that should come first?"
+
+If the learner suggests changes:
+- Refine the epitome. This may require adjusting which vertices are included, the complexity level, or the framing.
+- If the learner's desired starting point conflicts with prerequisite structure, explain the dependency constructively: "I can see why X is exciting — to get there solidly, we'd want to cover Y first, which typically takes N sessions. Would you like to start with Y framed around getting to X?"
+
+**Never override the learner's priorities without explanation.** The epitome should feel like THEIR starting point, not an imposed one.
+
+Only proceed to Step 2b (Task Class Design) after the learner confirms the epitome direction.
 
 **2b. Build Task Classes**
 Organize selected vertices into 3-5 task classes ordered simple-to-complex:
