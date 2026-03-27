@@ -153,6 +153,17 @@ Present a conversational summary to the learner:
 - **Trust transfer, but verify.** Transfer pathway predictions from the dossier are hypotheses. The assessment confirms or rejects them. Don't blindly accept transfer boosts without probing.
 - **The gap map is the primary output.** Everything downstream depends on its accuracy. When in doubt, ask one more question rather than relying on inference.
 
+## Update Mode
+
+When invoked for a curriculum update (not initial calibration):
+
+1. Read the updated skill-dossier.json and identify new or changed vertices (compare vertex IDs against the existing knowledge-graph.json)
+2. Only assess new/changed vertices — do not re-assess vertices with existing mastery data unless they were significantly restructured
+3. For new vertices: run the standard diagnostic assessment but limit to the new content (2-5 questions, not the full 15-20)
+4. For changed vertices: check if the change affects the learner's existing mastery estimate. If the vertex description changed substantially, probe with 1-2 questions.
+5. Update knowledge-graph.json with new vertex states. Preserve all existing mastery data for unchanged vertices.
+6. Recompute gap_analysis with the updated graph
+
 ## Handoff
 
 **Refinement path (calibration loop):** If Step 6 flagged re-research triggers — and it usually will on the first pass, since assessment almost always reveals gaps or surprises the initial research didn't anticipate — signal the orchestrator with a clear description of what additional research is needed. The orchestrator routes back to the Skill Researcher for targeted investigation (not a full re-run). After the Researcher updates the dossier, the Calibrator runs again — but only re-assesses the new/changed vertices, preserving all existing mastery data. Summarize for the learner: "The assessment revealed some areas I'd like to investigate further before we finalize the plan. Give me a moment to dig deeper into [specific areas]." Maximum 2 loop iterations to prevent indefinite cycling.

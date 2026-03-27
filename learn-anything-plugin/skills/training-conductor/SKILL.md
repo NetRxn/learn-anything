@@ -61,6 +61,21 @@ Read `teaching_preferences` from domain-assessment.json:
 
 Maintain the instructor persona consistently throughout the session. Do not break character unless the learner asks to change style.
 
+#### Transcript Initialization
+
+Create a transcript file at `learn-anything/<skill-slug>/transcripts/session-<N>-<YYYY-MM-DD>.md` where `<N>` is the session number (from progress.json session count + 1, or 1 if no progress.json exists). Create the `transcripts/` directory if it does not exist.
+
+Initialize with:
+
+```markdown
+# Session <N> — <YYYY-MM-DD>
+## Session Metadata
+- Skill: <skill-name>
+- Template: <selected-template>
+- Instructor Persona: <persona or "default">
+- Difficulty Zone: <starting-zone>
+```
+
 5. **Plan the session** — Based on agenda, determine:
    - Which retrieval probes to run (vertices due for delayed review)
    - What new content to introduce (next in the task class sequence)
@@ -106,6 +121,29 @@ Adjustment levers: scaffolding level, interleaving intensity, Bloom's level of q
 
 **Never over-correct.** Wait for 3-5 data points. Use hysteresis. Offer student choice when uncertain.
 
+#### Transcript Writing
+
+As the session progresses, periodically append to the transcript file in two layers:
+
+**Layer 1 — Verbatim Exchanges:**
+For each significant exchange, append:
+
+```markdown
+### Topic: <vertex-name>
+**Instructor:** <full question or teaching point>
+**Learner:** <full response>
+**Assessment:** <observation, mastery implication>
+```
+
+**Layer 2 — Teaching Decisions:**
+When making difficulty adjustments, template switches, or scaffolding changes, note them inline:
+
+```markdown
+> *[Teaching note: Shifted from Template C to Template A — learner struggling with prerequisite concept]*
+```
+
+Write to the transcript at natural breakpoints (topic transitions, after assessment observations) rather than after every single exchange.
+
 ### Closing (~10-15% of session)
 
 1. **Cumulative mini-quiz**: 3-5 quick retrieval probes covering today's key concepts
@@ -113,6 +151,32 @@ Adjustment levers: scaffolding level, interleaving intensity, Bloom's level of q
 3. **Identity reinforcement**: Brief, natural connection to the identity frame. "Nice work — you're thinking like a [identity] now."
 4. **Preview next session**: What we'll work on next and why
 5. **Process goal reminder**: What to practice between sessions (if applicable)
+
+#### Finalize Transcript
+
+Append the Session Debrief to the transcript file:
+
+```markdown
+## Session Debrief
+### What Went Well
+- <specific moments, breakthroughs, strong responses>
+
+### What Went Poorly
+- <confusion points, misconceptions, pacing issues>
+
+### Areas for Improvement
+- <teaching approach adjustments, content gaps identified>
+
+### Mastery Transitions
+- <vertex-name>: <from_state> → <to_state>
+
+### Next Session Recommendations
+- <recommended agenda, topics to revisit, new content to introduce>
+```
+
+Update the Session Metadata with final values:
+- Duration: <actual-minutes>
+- Difficulty Zone: <start> → <end>
 
 ### Validate Output
 

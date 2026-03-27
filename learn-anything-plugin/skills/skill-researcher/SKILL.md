@@ -199,6 +199,22 @@ Present a conversational summary to the learner covering:
 - **The graph structure matters more than individual descriptions.** Getting the prerequisite relationships right is more important than having perfect descriptions. An incorrect prerequisite edge will cause the Curriculum Architect to sequence things wrong.
 - **Research sources must be recorded.** Include the URLs and types of sources consulted. This enables future expert validation and shows the learner what the decomposition is based on.
 
+## Update Mode
+
+When invoked for a curriculum update (not initial research), follow a modified process:
+
+1. Read the existing `skill-dossier.json` first
+2. Read the update directive (what changed, from the user or the `/update` command)
+3. Conduct targeted web research focused on the changes described
+4. Compare findings against the existing graph:
+   - **New components:** Add as new vertices with appropriate edges. Use new unique IDs — do not reuse existing vertex IDs.
+   - **Changed components:** Update existing vertex descriptions, scores, and connections. Preserve the vertex ID.
+   - **Deprecated components:** Mark vertices with a note in the description (do not delete — the learner may have progress on them)
+5. Update `freshness_assessment` with current date and findings
+6. Write the delta summary for the user: what was added, changed, and deprecated
+
+Preserve all existing vertex IDs — changing IDs would break knowledge graph references.
+
 ## Handoff
 
 After writing skill-dossier.json, the Learner Calibrator takes over. It reads the dependency graph and transfer pathways to design a diagnostic assessment. Summarize for the learner: the major component clusters found, key transfer pathways from their experience, and that next comes a conversational assessment of what they already know.
