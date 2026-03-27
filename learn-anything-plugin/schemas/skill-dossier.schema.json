@@ -33,7 +33,7 @@
               "impact_score": { "type": "number", "minimum": 0, "maximum": 1, "description": "How much mastering this component contributes to overall competence" },
               "confidence": { "type": "string", "enum": ["high", "medium", "low"], "description": "System confidence in this decomposition" },
               "verification_needed": { "type": "string", "description": "If confidence is low, what specifically needs expert validation" },
-              "embedding": { "type": "array", "items": { "type": "number" }, "description": "Semantic embedding vector for pgvector similarity search" },
+              "embedding": { "type": "array", "items": { "type": "number" }, "description": "DEFERRED — Semantic embedding vector for pgvector similarity search. Not generated in current architecture (no vector DB). Leave null/omitted." },
               "cluster_id": { "type": "string", "description": "Natural cluster grouping for modular visualization" },
               "assessment_criteria": { "type": "string", "description": "How to assess mastery of this component" },
               "example": { "type": "string", "description": "Concrete real-world example demonstrating this component" }
