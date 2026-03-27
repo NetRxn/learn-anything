@@ -128,6 +128,41 @@
           "notes": { "type": "string" }
         }
       }
+    },
+
+    "freshness_assessment": {
+      "type": "object",
+      "properties": {
+        "risk_level": {
+          "type": "string",
+          "enum": ["low", "medium", "high", "very_high"],
+          "description": "How rapidly the field is evolving"
+        },
+        "last_major_change": {
+          "type": "string",
+          "description": "Date or description of most recent significant change"
+        },
+        "evolution_notes": {
+          "type": "string",
+          "description": "Notes on what is changing and how fast"
+        }
+      },
+      "description": "Assessment of how rapidly this field is evolving — informs curriculum update frequency"
+    },
+
+    "expert_panel": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["name", "contribution"],
+        "properties": {
+          "name": { "type": "string" },
+          "contribution": { "type": "string", "description": "What they are known for in this field" },
+          "teaching_style": { "type": "string", "description": "Known teaching approach or persona, if applicable" },
+          "source_url": { "type": "string" }
+        }
+      },
+      "description": "Masters of the field identified during research — presented to learner as potential instructor personas"
     }
   }
 }

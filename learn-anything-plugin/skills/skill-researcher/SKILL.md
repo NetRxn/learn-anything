@@ -38,16 +38,51 @@ Use web search to survey the territory. Search for:
 
 Spend 3-6 web searches here. Look for structural information, not just content — how do experts organize this domain?
 
-### Step 2: Simulated Expert Interviews
+#### Freshness Assessment
 
-Work through the six Ferriss questions from `references/expert-interview-protocol.md`. For EACH question:
+Assess field velocity during landscape mapping:
+- Check for: release cadence, recent major version changes, active development blogs/changelogs, version numbers, "what's new" pages
+- If the field has had significant changes within the last 6 months, flag as `HIGH_FRESHNESS_RISK` or `VERY_HIGH_FRESHNESS_RISK`
+- For HIGH or VERY_HIGH freshness risk: double the web search budget, prioritize official documentation and creator content (blog posts, tutorials, changelogs, release notes) over general articles
+- For technical/product skills: always search for official documentation, creator blogs, tutorials from the tool's authors, and recent conference talks — these are higher-signal than third-party articles for rapidly evolving tools
 
-1. Search the web for real expert answers (interviews, podcasts, Reddit, blog posts)
-2. Synthesize across multiple perspectives
-3. Note where experts agree vs. disagree
-4. Flag when filling gaps with general LLM knowledge (mark as lower confidence)
+Record the assessment in the dossier output as `freshness_assessment`.
 
-Spend 4-8 web searches across the six questions, focusing on the ones most relevant to this skill type.
+#### Creator Content Priority
+
+For technical/product skills, search for official documentation, creator blogs, tutorials from the tool's authors, and recent conference talks. These are higher-signal than third-party articles for rapidly evolving tools. Prioritize these over general "how to learn X" articles.
+
+### Step 2: Expert Interview Synthesis (REQUIRED — 6-12 web searches)
+
+Read `references/expert-interview-protocol.md` before proceeding. This step is mandatory — execute ALL six Ferriss questions using the search strategies documented there.
+
+For each of the 6 Ferriss questions:
+1. Conduct at least one web search using the search patterns from the protocol
+2. Document findings with source URLs
+3. Synthesize across perspectives — where experts agree, note consensus; where they disagree, note the controversy
+
+If a question produces zero findings after two search attempts, note it explicitly with `confidence: LOW` and record what was searched.
+
+#### Expert Panel Discovery
+
+During interview synthesis, identify masters of the field — people who have driven the state of the art. For each, note:
+- **name**: Full name
+- **contribution**: What they're known for in this field
+- **teaching_style**: Any known teaching approach or persona (e.g., "Feynman: intuitive, visual, playful explanations", "Knuth: rigorous, methodical, detail-oriented")
+- **source_url**: Where this information was found
+
+Store these in the `expert_panel` array in the dossier output. The Curriculum Architect will present these to the learner as potential instructor personas.
+
+Search for: "[field] greatest teachers", "[field] best instructors", "[field] pioneers", "[field] thought leaders". If the domain is too niche for recognizable teaching personas, note this — the downstream skill will fall back to asking the learner directly.
+
+### Step 2 Validation Checkpoint
+
+Before proceeding to component identification:
+- Verify all 6 Ferriss questions produced at least one finding with a source URL
+- Verify `research_sources` will include at least 3 entries with `type: "expert_interview"`
+- If fewer than 3 expert_interview sources exist, the research phase is incomplete — conduct additional targeted searches
+
+This checkpoint exists because the Ferriss interview protocol is frequently skipped, leading to decompositions that reflect LLM training data rather than real expert perspectives.
 
 ### Step 3: Component Identification (Multi-Pass Decomposition)
 
