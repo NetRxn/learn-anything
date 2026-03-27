@@ -155,4 +155,6 @@ Present a conversational summary to the learner:
 
 ## Handoff
 
-After writing knowledge-graph.json, the Curriculum Architect takes over. It reads the gap analysis to design the learning plan. Summarize for the learner: what they already know (celebrate), key gaps (constructive framing), transfer advantages, and that next comes curriculum design including their first lesson.
+**Normal path:** After writing knowledge-graph.json, the Curriculum Architect takes over. It reads the gap analysis to design the learning plan. Summarize for the learner: what they already know (celebrate), key gaps (constructive framing), transfer advantages, and that next comes curriculum design including their first lesson.
+
+**Re-research path (calibration loop):** If Step 6 flagged re-research triggers, signal the orchestrator with a clear description of what additional research is needed. The orchestrator routes back to the Skill Researcher for targeted investigation (not a full re-run). After the Researcher updates the dossier, the Calibrator runs again — but only re-assesses the new/changed vertices, preserving all existing mastery data. Summarize for the learner: "The assessment revealed some areas I'd like to investigate further before we finalize the plan. Give me a moment to dig deeper into [specific areas]." Maximum 2 loop iterations to prevent indefinite cycling.
