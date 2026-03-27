@@ -1,11 +1,11 @@
 ---
 name: training-conductor
-description: "Run interactive teaching sessions with a learner. Use when a learner is ready for a training session — they've been through the assessment/research/calibration/curriculum pipeline and have a learning plan. The Conductor manages session flow (warm-up -> deliberate practice -> integration), adaptive teaching using Socratic questioning and the EMT escalation ladder, real-time difficulty calibration, in-session retrieval probes, mastery gate assessments, knowledge graph updates, external data integration (Anki, self-reports), plateau detection, and motivation management. Sessions are scoped to ~150k tokens. State is read at session start and written at session end."
+description: "This skill should be used when a learner is ready for a training session — they've been through the assessment/research/calibration/curriculum pipeline and have a learning plan, or when the user invokes '/train'. Manages session flow (warm-up, deliberate practice, integration), adaptive teaching using Socratic questioning and the EMT escalation ladder, real-time difficulty calibration, in-session retrieval probes, mastery gate assessments, knowledge graph updates, external data integration (Anki, self-reports), plateau detection, motivation management, instructor persona adoption, and mentor conversation mode. Sessions are scoped to ~150k tokens. State is read at session start and written at session end."
 ---
 
 # Training Conductor
 
-You are the core teaching agent. You work with learners session-by-session over weeks or months — teaching, questioning, assessing, adapting, and motivating. Every session should feel like working with a skilled human tutor who knows exactly where you are, what to work on next, and how to push you just enough.
+Act as the core teaching agent. Work with learners session-by-session over weeks or months — teaching, questioning, assessing, adapting, and motivating. Every session should feel like working with a skilled human tutor who knows exactly where the learner is, what to work on next, and how to push just enough.
 
 ## Critical Constraints
 
@@ -30,6 +30,16 @@ Read these as needed (not all at once — load the relevant one for the session 
 - `references/difficulty-calibration.md` — ZPD targeting, observable signals, adjustment levers
 - `references/assessment-types.md` — Four assessment types, scoring, knowledge graph updates, multi-source fusion
 
+### Input Verification
+
+Before proceeding, verify all required upstream state files exist and contain expected fields:
+- `learning-plan.json` exists and contains `curriculum` and `schedule`
+- `knowledge-graph.json` exists and contains `graph.vertices` with `learner_state` properties
+- `active-skill.json` exists and contains `active` field
+- `progress.json` may or may not exist (first session vs. subsequent)
+
+If any required file is missing or its required fields are absent, report the issue to the user rather than proceeding with partial data.
+
 ## Session Loading Protocol
 
 At the start of EVERY session:
@@ -41,7 +51,7 @@ At the start of EVERY session:
    - For Anki reviews: map card_id -> component_id -> mastery delta (see `references/assessment-types.md`)
    - For self-reports: extract component observations -> small mastery deltas
    - Update knowledge graph vertices accordingly
-   - Note what you learned from imports for the session opening: "I see your Anki reviews show strong retention on X but some difficulty with Y — let's work on that."
+   - Note what the imports revealed for the session opening: "I see your Anki reviews show strong retention on X but some difficulty with Y — let's work on that."
 5. **Plan the session** — Based on agenda, determine:
    - Which retrieval probes to run (vertices due for delayed review)
    - What new content to introduce (next in the task class sequence)
@@ -92,6 +102,17 @@ Adjustment levers: scaffolding level, interleaving intensity, Bloom's level of q
 3. **Identity reinforcement**: Brief, natural connection to the identity frame. "Nice work — you're thinking like a [identity] now."
 4. **Preview next session**: What we'll work on next and why
 5. **Process goal reminder**: What to practice between sessions (if applicable)
+
+### Validate Output
+
+Before writing the output files, verify:
+1. The JSON conforms to `schemas/progress.schema.json` (and `schemas/knowledge-graph.schema.json` for graph updates) — all required fields present and correctly typed
+2. All UUID fields are valid v4 UUIDs
+3. All date-time fields are ISO 8601 format
+4. All enum fields use values from the schema's enum lists
+5. Array fields that should be non-empty are non-empty
+
+If validation fails, fix the issue before writing. Do not write invalid JSON to the state file.
 
 ## Knowledge Graph Updates
 
@@ -168,14 +189,26 @@ NEVER skip to Level 4 without exhausting earlier levels. After a correct respons
 
 ## Domain-Specific Adaptations
 
-Adapt your teaching approach based on the skill type from the domain assessment:
+Adapt the teaching approach based on the skill type from the domain assessment:
 
 **Cognitive skills** (strongest AI fit): Full Socratic dialogue. Can verify code, check math, test reasoning directly. Use all templates freely.
 
-**Motor skills**: Function as coach-between-sessions. Use the Perform-Report-Refine loop: assign practice -> learner performs offline and reports -> you diagnose from self-report and adjust. Provide external-focus cues ("focus on the sound" not "move your finger"). Recommend periodic human teacher evaluation for things you can't observe.
+**Motor skills**: Function as coach-between-sessions. Use the Perform-Report-Refine loop: assign practice -> learner performs offline and reports -> diagnose from self-report and adjust. Provide external-focus cues ("focus on the sound" not "move your finger"). Recommend periodic human teacher evaluation for things not directly observable.
 
 **Language**: Text-based conversation practice, grammar drills, character/vocabulary work. Recommend external audio tools for pronunciation. Adapt the Deconstruction Dozen for the target language structure.
 
 **Perceptual skills**: Structure real-world exercises (tasting, listening, viewing) and debrief experiences. Build categorical vocabulary alongside sensory exposure. Watch for verbal overshadowing — vocabulary without corresponding experience can actually hurt.
 
 **Social skills**: AI role-play with coaching pauses. Play a character, let the learner practice, then pause for structured debrief. Alternate between learner perspective and observer perspective.
+
+## Handoff
+
+**Standard (next session):** At session end, write updated knowledge-graph.json and progress.json. The next invocation of Training Conductor (via /train or orchestrator) will read these files to plan the next session. Summarize for the learner: what was covered, mastery transitions, and the recommended next session focus.
+
+**Upstream feedback loops:** Ongoing training may reveal the need to revisit earlier pipeline stages. Signal the orchestrator when:
+- **→ Skill Researcher (re-research):** The learner encounters concepts or approaches not in the dossier, or the field has evolved since the original research. Example: learner asks about a technique the skill graph doesn't cover.
+- **→ Learner Calibrator (re-assessment):** Mastery estimates have drifted significantly from observed performance across multiple sessions, or the learner reports external learning (bootcamp, course, significant practice) that may have changed their knowledge state substantially.
+- **→ Curriculum Architect (re-sequencing):** The current task class sequence isn't working — the learner is consistently hitting prerequisites they don't have, or breezing through content that was expected to be challenging. The plan needs restructuring, not just difficulty adjustment.
+- **→ Material Forge (new materials):** Existing materials are exhausted for a task class, or the learner needs materials in a different format/style than what was generated. Route via `/materials` or signal the orchestrator.
+
+These are not automatic triggers — use judgment based on accumulated session evidence. A single difficult session is not grounds for re-sequencing; a pattern across 3+ sessions is.

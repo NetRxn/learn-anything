@@ -8,7 +8,7 @@
       "name": "learn-anything",
       "source": "./learn-anything-plugin",
       "description": "A meta-learning system that helps people learn any skill efficiently through adaptive assessment, curriculum design, spaced repetition, and interactive training.",
-      "version": "1.0.3"
+      "version": "2.0.0-alpha.1"
     }
   ]
 }

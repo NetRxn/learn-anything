@@ -1,11 +1,11 @@
 ---
 name: curriculum-architect
-description: "Design a complete, time-bound learning plan from a knowledge graph gap analysis. Use after the Learner Calibrator has produced the gap map. Applies 4C/ID whole-task instruction, Elaboration Theory epitome design, productive failure placement, and a seven-layer motivation architecture to produce a sequenced curriculum with task classes, a dual-timeline schedule, assessment criteria, and plateau protocols. Output is structured JSON conforming to learning-plan.schema.json."
+description: "This skill should be used when the Learner Calibrator has produced the gap map and a learning plan needs designing. Applies 4C/ID whole-task instruction, Elaboration Theory epitome design, productive failure placement, and a seven-layer motivation architecture. Produces a sequenced curriculum with task classes, a dual-timeline schedule, assessment criteria, and plateau protocols. Includes a conversational checkpoint for epitome refinement with the learner. Output is structured JSON conforming to learning-plan.schema.json."
 ---
 
 # Curriculum Architect
 
-You design the bridge between where the learner is and where they want to be. You work from the gap — not from scratch — leveraging existing knowledge as scaffolding and transfer pathways as accelerators.
+Design the bridge between where the learner is and where they want to be. Work from the gap — not from scratch — leveraging existing knowledge as scaffolding and transfer pathways as accelerators.
 
 ## Workspace
 
@@ -19,6 +19,15 @@ Before starting, read:
 3. `schemas/learning-plan.schema.json` — Output format
 4. `references/4cid-encoding.md` — Curriculum generation rules (4C/ID, Elaboration Theory, Productive Failure, interleaving, spacing, mastery gates)
 5. `references/motivation-architecture.md` — Seven-layer motivation system
+
+### Input Verification
+
+Before proceeding, verify all required upstream state files exist and contain expected fields:
+- `knowledge-graph.json` exists and contains `graph.vertices` (non-empty array) and `gap_analysis`
+- `domain-assessment.json` exists and contains `learner_profile.constraints` and `approach_strategy`
+- `active-skill.json` exists and contains `active` field
+
+If any required file is missing or its required fields are absent, report the issue to the user rather than proceeding with partial data.
 
 ## Process
 
@@ -130,6 +139,17 @@ Follow `references/motivation-architecture.md` to build all seven layers:
 
 Write the complete Learning Plan as JSON conforming to `schemas/learning-plan.schema.json`. Save to `learn-anything/<skill-slug>/learning-plan.json`.
 
+### Validate Output
+
+Before writing the output file, verify:
+1. The JSON conforms to `schemas/learning-plan.schema.json` — all required fields present and correctly typed
+2. All UUID fields are valid v4 UUIDs
+3. All date-time fields are ISO 8601 format
+4. All enum fields use values from the schema's enum lists
+5. Array fields that should be non-empty are non-empty
+
+If validation fails, fix the issue before writing. Do not write invalid JSON to the state file.
+
 Present a conversational summary to the learner:
 1. The epitome — what they'll do first and why
 2. The task class progression — a high-level roadmap of complexity levels
@@ -142,10 +162,14 @@ The summary should be energizing. The learner should finish this conversation th
 
 ## Key Rules
 
-- **Work from the gap, not from scratch.** The learner is not a blank slate. The knowledge graph tells you what they already know. Use it.
-- **The epitome is critical.** If the first lesson doesn't feel like a complete (if simplified) version of the real skill, you've failed. Don't start with isolated components.
+- **Work from the gap, not from scratch.** The learner is not a blank slate. The knowledge graph shows what they already know. Use it.
+- **The epitome is critical.** If the first lesson doesn't feel like a complete (if simplified) version of the real skill, the design has failed. Don't start with isolated components.
 - **Respect the 4C/ID support fading rules.** The sawtooth pattern (support fades within a class, resets at class boundaries) is load-bearing. Don't skip it.
 - **Productive failure is selective.** Only for conceptual building blocks with known naive theories. Never for procedures. Never when the learner is frustrated.
 - **The schedule must be realistic.** Check it against the learner's stated constraints. If the curriculum doesn't fit the timeframe at the learner's available hours, adjust scope — don't pretend it fits.
 - **Dual timeline, always.** Even if the stated timeframe is generous, provide an extended roadmap. Learning doesn't end when the plan does.
 - **Motivation is structural, not inspirational.** Don't add "stay motivated!" text. Build motivation INTO the curriculum structure: process goals, visible progress, pre-framed plateaus, community connections.
+
+## Handoff
+
+After finalizing learning-plan.json, the Material Forge takes over. It reads the curriculum to generate learning materials (worked examples, flashcards, assessments, visuals). Summarize for the learner: the epitome (first lesson), task class progression, schedule, and that materials generation is next.

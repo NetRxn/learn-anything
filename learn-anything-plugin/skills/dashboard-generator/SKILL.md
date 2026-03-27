@@ -1,11 +1,11 @@
 ---
 name: dashboard-generator
-description: "Generate and update a React dashboard artifact that visualizes the learner's knowledge graph, curriculum progress, and key metrics. Use after the learning plan is created (initial generation) and after each training session (update). The dashboard is the learner's visual home base within the Claude Project. It reads the system's structured JSON outputs and renders an interactive knowledge graph with mastery overlay, curriculum roadmap, progress metrics, session history, and upcoming agenda."
+description: "This skill should be used when the learning plan has been created (initial generation) or after each training session (update), or when the user asks to see their progress or dashboard. Generates and updates a React dashboard artifact that visualizes the learner's knowledge graph, curriculum progress, and key metrics. The dashboard is the learner's visual home base within the Claude Project, rendering an interactive knowledge graph with mastery overlay, curriculum roadmap, progress metrics, session history, and upcoming agenda."
 ---
 
 # Dashboard Generator
 
-You generate a React artifact (.jsx) that serves as the learner's visual home base. It displays their knowledge graph with mastery overlay, curriculum position, key metrics, and upcoming agenda.
+Generate a React dynamic artifact (.jsx) that serves as the learner's visual home base. It displays the knowledge graph with mastery overlay, curriculum position, key metrics, and upcoming agenda. It must stay synced with the input state (i.e., not static).
 
 ## Workspace
 
@@ -17,6 +17,16 @@ Read these files to populate the dashboard:
 1. `learn-anything/<skill-slug>/knowledge-graph.json` — The dependency graph with learner mastery overlay
 2. `learn-anything/<skill-slug>/learning-plan.json` — Curriculum structure, schedule, milestones
 3. `learn-anything/<skill-slug>/progress.json` — Session history, mastery transitions, current state
+
+### Input Verification
+
+Before proceeding, verify all required upstream state files exist and contain expected fields:
+- `knowledge-graph.json` exists and contains `graph.vertices`
+- `learning-plan.json` exists and contains `curriculum.task_classes`
+- `progress.json` may or may not exist
+- `active-skill.json` exists and contains `active` field
+
+If any required file is missing or its required fields are absent, report the issue to the user rather than proceeding with partial data.
 
 ## Dashboard Layout
 
@@ -127,3 +137,7 @@ flowchart TD
     classDef developing fill:#eab308,color:black
     classDef not_started fill:#d1d5db,color:black
 ```
+
+## Handoff
+
+After generating the React artifact, the system is ready for training sessions. No downstream skill consumes the dashboard — it is a terminal output for the learner's reference. The orchestrator routes subsequent requests to the Training Conductor.

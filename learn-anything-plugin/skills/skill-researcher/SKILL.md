@@ -1,11 +1,11 @@
 ---
 name: skill-researcher
-description: "Deep investigation of a target skill: deconstruction into components, dependency graph construction, frequency/impact analysis, transfer pathway identification, and failure point cataloging. Use this skill after the Domain Assessor has classified the skill and gathered the learner profile. This skill uses web search extensively to ground its decomposition in real expert perspectives rather than relying solely on LLM knowledge. Output is a Skill Research Dossier as structured JSON conforming to skill-dossier.schema.json, with the dependency graph in AGE-compatible vertex/edge format."
+description: "This skill should be used when the user's learning goal has been classified by the Domain Assessor and needs deep investigation. Performs skill deconstruction into components, dependency graph construction, frequency/impact analysis, transfer pathway identification, failure point cataloging, and expert panel discovery. Uses web search extensively to ground decomposition in real expert perspectives. Output is a Skill Research Dossier conforming to skill-dossier.schema.json."
 ---
 
 # Skill Researcher
 
-You are the research engine of a meta-learning system. Your job is to deeply investigate a target skill, decompose it into its fundamental components, build a dependency graph, identify which components matter most, find transfer pathways from the learner's existing skills, and catalog common failure points.
+Act as the research engine of a meta-learning system. Deeply investigate a target skill, decompose it into its fundamental components, build a dependency graph, identify which components matter most, find transfer pathways from the learner's existing skills, and catalog common failure points.
 
 ## Workspace
 
@@ -15,8 +15,16 @@ All state files live in `learn-anything/<skill-slug>/`. Read `learn-anything/act
 
 Before starting, read:
 1. `learn-anything/<skill-slug>/domain-assessment.json` — The skill classification and learner profile
-2. `schemas/skill-dossier.schema.json` — The output format you must produce
+2. `schemas/skill-dossier.schema.json` — The required output format
 3. `references/expert-interview-protocol.md` — The Ferriss interview questions and deconstruction techniques
+
+### Input Verification
+
+Before proceeding, verify all required upstream state files exist and contain expected fields:
+- `domain-assessment.json` exists and contains `skill_classification.target_skill` and `learner_profile`
+- `active-skill.json` exists and contains `active` field
+
+If any required file is missing or its required fields are absent, report the issue to the user rather than proceeding with partial data.
 
 ## Process
 
@@ -37,7 +45,7 @@ Work through the six Ferriss questions from `references/expert-interview-protoco
 1. Search the web for real expert answers (interviews, podcasts, Reddit, blog posts)
 2. Synthesize across multiple perspectives
 3. Note where experts agree vs. disagree
-4. Flag when you're filling gaps with general LLM knowledge (mark as lower confidence)
+4. Flag when filling gaps with general LLM knowledge (mark as lower confidence)
 
 Spend 4-8 web searches across the six questions, focusing on the ones most relevant to this skill type.
 
@@ -45,7 +53,7 @@ Spend 4-8 web searches across the six questions, focusing on the ones most relev
 
 This is the most critical step. Use a multi-pass approach to avoid blind spots:
 
-**Pass 1 — Top-down:** Start from the skill as a whole. What are the major sub-domains? Break each sub-domain into components. Break components into sub-components until you reach independently assessable units.
+**Pass 1 — Top-down:** Start from the skill as a whole. What are the major sub-domains? Break each sub-domain into components. Break components into sub-components until reaching independently assessable units.
 
 **Pass 2 — Bottom-up:** Start from the most basic actions/knowledge a practitioner uses daily. What are the atomic units? Group them upward into logical clusters.
 
@@ -63,8 +71,10 @@ For each component, classify:
 - **confidence**: `high`, `medium`, or `low`
 - **verification_needed**: If confidence is `low`, what specifically needs validation?
 - **example**: One concrete real-world example demonstrating this component
+- **cognitive_load_type**: Classify as `intrinsic` (inherent complexity of the component itself), `extraneous` (complexity from how it's presented — should be minimized), or `germane` (productive complexity that builds schema). Most components are intrinsic. Flag any that are primarily germane (learning-to-learn skills) or that risk extraneous load if poorly taught.
+- **assessment_criteria**: Brief description of how mastery of this component can be assessed. Be specific: "Can explain the difference between X and Y" or "Can perform X correctly under Y conditions". This feeds into the Learner Calibrator's question design and Material Forge's assessment instruments.
 
-**Confabulation check:** For EVERY component, provide a specific real-world example. If you cannot think of one, flag the component as potentially confabulated and mark confidence as `low`.
+**Confabulation check:** For EVERY component, provide a specific real-world example. If no example comes to mind, flag the component as potentially confabulated and mark confidence as `low`.
 
 **MECE check:** Components should be Mutually Exclusive (minimal overlap) and Collectively Exhaustive (covering the full skill at the target Bloom's level). Explicitly verify both.
 
@@ -85,6 +95,8 @@ Build the prerequisite and relationship structure:
 - Connect components where practice in one genuinely reinforces another
 - Different from prerequisites — A and B may not have a learning dependency, but practicing A improves B
 
+- **cluster_id**: Assign each vertex to a semantic cluster. Group components that naturally belong together (e.g., "foundations", "intermediate-techniques", "advanced-applications"). Use short kebab-case identifiers (e.g., `core-mechanics`, `strategy-layer`, `tooling`). Clusters inform the dashboard visualization and help the Curriculum Architect design task classes.
+
 **Graph quality checks:**
 - Every component should have at least one edge (no orphan nodes)
 - The prerequisite subgraph should be a DAG (no cycles)
@@ -97,7 +109,7 @@ Aim for 15-40 components for a typical skill. Fewer than 15 suggests under-decom
 Estimate the Pareto distribution for this domain:
 - What percentage of components account for what percentage of practical competence?
 - Is this an 80/20 domain (e.g., language vocabulary)? 90/10? 70/30?
-- Identify coverage thresholds: e.g., "the top 8 components (25%) cover ~70% of what you need for the stated competence level"
+- Identify coverage thresholds: e.g., "the top 8 components (25%) cover ~70% of what is needed for the stated competence level"
 
 Identify **gateway nodes** — components with the highest betweenness centrality in the prerequisite graph. These unlock the most downstream learning and should be prioritized regardless of their own frequency.
 
@@ -125,18 +137,33 @@ From the expert interviews and landscape mapping, catalog:
 
 Write the complete Skill Research Dossier as JSON conforming to `schemas/skill-dossier.schema.json`. Verify every required field is present. Save to `learn-anything/<skill-slug>/skill-dossier.json`.
 
+### Validate Output
+
+Before writing the output file, verify:
+1. The JSON conforms to `schemas/skill-dossier.schema.json` — all required fields present and correctly typed
+2. All UUID fields are valid v4 UUIDs
+3. All date-time fields are ISO 8601 format
+4. All enum fields use values from the schema's enum lists
+5. Array fields that should be non-empty are non-empty
+
+If validation fails, fix the issue before writing. Do not write invalid JSON to the state file.
+
 Present a conversational summary to the learner covering:
-1. The major component clusters you identified (using plain language, not vertex IDs)
+1. The major component clusters identified (using plain language, not vertex IDs)
 2. The most important components (gateway nodes + high-frequency/high-impact)
 3. Transfer pathways — what their existing experience gives them a head start on
 4. Key failure points to be aware of
-5. Your confidence level — where the decomposition is solid vs. where it should be validated
+5. Overall confidence level — where the decomposition is solid vs. where it should be validated
 
 ## Key Rules
 
-- **Ground everything in web search.** Your decomposition should reflect how real experts and real curricula structure this skill, not just LLM general knowledge. Every major structural decision should be traceable to at least one real-world source.
+- **Ground everything in web search.** The decomposition should reflect how real experts and real curricula structure this skill, not just LLM general knowledge. Every major structural decision should be traceable to at least one real-world source.
 - **Flag confidence honestly.** HIGH = supported by multiple expert sources and verified against existing curricula. MEDIUM = supported by general domain knowledge but not specifically validated. LOW = plausible but potentially confabulated — needs verification.
 - **Don't over-decompose.** A 25-component graph for "learn basic Python" is better than a 100-component graph. The Curriculum Architect will focus on a subset anyway. Err toward components that are independently assessable and meaningfully distinct.
-- **Transfer pathways are a first-class output.** The learner profile exists specifically so you can identify where existing knowledge accelerates learning. Don't skip this step.
+- **Transfer pathways are a first-class output.** The learner profile exists specifically to identify where existing knowledge accelerates learning. Do not skip this step.
 - **The graph structure matters more than individual descriptions.** Getting the prerequisite relationships right is more important than having perfect descriptions. An incorrect prerequisite edge will cause the Curriculum Architect to sequence things wrong.
-- **Research sources must be recorded.** Include the URLs and types of sources you consulted. This enables future expert validation and shows the learner what the decomposition is based on.
+- **Research sources must be recorded.** Include the URLs and types of sources consulted. This enables future expert validation and shows the learner what the decomposition is based on.
+
+## Handoff
+
+After writing skill-dossier.json, the Learner Calibrator takes over. It reads the dependency graph and transfer pathways to design a diagnostic assessment. Summarize for the learner: the major component clusters found, key transfer pathways from their experience, and that next comes a conversational assessment of what they already know.
