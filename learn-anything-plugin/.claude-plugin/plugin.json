@@ -1,5 +1,5 @@
 {
   "name": "learn-anything",
-  "version": "2.0.0-alpha.3",
+  "version": "2.0.0",
   "description": "A meta-learning system that helps people learn any skill efficiently through adaptive assessment, curriculum design, spaced repetition, and interactive training. Synthesizes Tim Ferriss' DiSSS/CaFE frameworks with evidence-based enhancements from cognitive psychology, instructional design, and motivation science."
 }
