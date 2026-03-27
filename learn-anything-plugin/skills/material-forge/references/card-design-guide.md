@@ -53,12 +53,31 @@ Cards are viewed on phone screens in Anki. SVGs render inside a white "light box
 
 - Use a viewBox with max logical width of 400 and scale proportionally
 - Use transparent or no background — the white container handles it
-- Use high-contrast colors against white: `#2563eb` (blue), `#dc2626` (red), `#16a34a` (green), `#9333ea` (purple), `#d97706` (amber), `#374151` (dark gray for text/lines)
-- Never use white or near-white for text or lines (invisible against the container)
 - Keep text at minimum 12px equivalent (legible on mobile)
 - Limit to 8 or fewer labeled elements per diagram (cognitive load)
 - Include a `<title>` element for accessibility
 - Avoid fine detail that disappears at small sizes
+
+### Mandatory Color Rules
+
+These rules are non-negotiable. Light-on-light rendering is a critical defect that destroys credibility.
+
+**Text colors:**
+- ALL text elements: minimum #374151 (dark gray) or darker — NEVER lighter
+- Labels, annotations, axis text: #1f2937 (near-black) preferred
+- NEVER use light colors (#93c5fd, #86efac, #fde68a, #d1d5db, etc.) for text or lines
+
+**Background colors:**
+- ALL backgrounds: #ffffff (white) or #f9fafb (near-white)
+- NEVER use dark backgrounds with dark text
+- NEVER use colored backgrounds unless contrast ratio exceeds 4.5:1
+
+**Shape colors:**
+- Stroke colors for shapes: use the high-contrast palette — #2563eb (blue), #dc2626 (red), #16a34a (green), #9333ea (purple), #d97706 (amber), #374151 (dark gray)
+- Fill colors for shapes: use 10-15% opacity versions of stroke colors (e.g., `fill="rgba(37,99,235,0.1)"` for light blue fill with #2563eb stroke)
+- NEVER use a fill color as the only visual indicator — always pair with stroke or text
+
+**Verification rule:** Before finalizing any SVG, verify no text or line element uses a color lighter than #6b7280 against a white/light background.
 
 ### SVG in Card Fields
 
