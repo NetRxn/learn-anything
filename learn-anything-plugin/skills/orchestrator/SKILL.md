@@ -199,11 +199,13 @@ Once in the LEARNING phase:
 **"Show my knowledge graph / progress"** -> Route to Dashboard Generator
 **"I've been practicing in Anki"** -> Ask for the .apkg export, create an external import file in `learn-anything/<slug>/external-imports/`, route to Training Conductor which will process it at session start
 **"I want to add a self-report"** -> Structure the report as JSON per the external-import schema, save to `learn-anything/<slug>/external-imports/`, note it will be processed at next session start
+**"Update curriculum / things have changed"** -> Route through the update cascade: Skill Researcher (update mode) → Learner Calibrator (targeted re-assessment) → Curriculum Architect (update mode). Archive current state files first. Can also be triggered via `/update` command.
 **"Change teaching style / Update persona"** -> Route to Domain Assessor to update `teaching_preferences` in domain-assessment.json. If the skill dossier has an `expert_panel`, present it again for selection. Otherwise, ask directly about preferences. The change takes effect at the next training session.
 **"My goals have changed"** -> Assess the scope of change and route appropriately
 **"I want to start a new skill"** -> Create a new workspace directory under `learn-anything/` with a new slug. Update `learn-anything/active-skill.json` to point to it. Start a new onboarding flow. The previous skill's workspace is preserved intact.
 **"Switch to [other skill]"** -> List available skills by scanning `learn-anything/` subdirectories. Update `learn-anything/active-skill.json` to the selected slug. Resume from wherever that skill left off.
 **"What skills am I learning?"** -> List all `learn-anything/*/domain-assessment.json` files and show skill name + current phase for each.
+**"Review session notes / Show transcript"** -> Read the most recent transcript from `learn-anything/<slug>/transcripts/`. If the user asks for a specific session, read that session's transcript. Summarize key takeaways if requested.
 
 ## Key Rules
 
