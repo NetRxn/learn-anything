@@ -1,0 +1,5 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "SessionPack",
+  "$ref": "urn:netrxn:child-learning:contracts:0.1.0#/$defs/SessionPack"
+}
