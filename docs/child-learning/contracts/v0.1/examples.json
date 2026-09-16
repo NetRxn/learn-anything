@@ -1,0 +1,187 @@
+{
+  "CanonicalCompetency": {
+    "schema_version": "0.1.0",
+    "id": "reading.en.blend-cvc",
+    "revision": "draft-1",
+    "domain_id": "reading.en",
+    "language_tag": "en-US",
+    "strand": "Decoding",
+    "name": "Blend a taught CVC word",
+    "success_criteria": [
+      "Produce a blend of a novel taught-pattern item without a model."
+    ],
+    "relationships": [],
+    "source_refs": [
+      {
+        "source_id": "synthetic-source",
+        "url": "https://example.org/fixture",
+        "locator": "Synthetic fixture only",
+        "basis": "reviewer_inferred",
+        "status": "proposed"
+      }
+    ],
+    "status": "proposed",
+    "grade_bands": [
+      "early"
+    ],
+    "assessment_modes": [
+      "independent",
+      "retention"
+    ]
+  },
+  "EvidenceEvent": {
+    "schema_version": "0.1.0",
+    "event_id": "event-demo-1",
+    "learner_id": "learner-demo-a",
+    "session_id": "session-demo-1",
+    "device_id": "device-demo",
+    "device_sequence": 1,
+    "observed_at": "2026-09-16T12:00:00Z",
+    "graph_release_id": "reading-demo-1",
+    "policy_revision": "early-demo-1",
+    "activity_id": "choice-1",
+    "item_id": "item-1",
+    "competency_ids": [
+      "reading.en.blend-cvc"
+    ],
+    "scorer_id": "choice",
+    "scorer_version": "v1",
+    "assistance": "none",
+    "modality": "touch",
+    "timing_context": "immediate",
+    "outcome": {
+      "status": "scored",
+      "score": 1
+    }
+  },
+  "MotivationState": {
+    "schema_version": "0.1.0",
+    "learner_id": "learner-demo-a",
+    "revision": "motivation-1",
+    "policy_revision": "motivation-policy-1",
+    "as_of": "2026-09-16T12:00:00Z",
+    "affinities": [
+      {
+        "dimension": "theme",
+        "value": "space",
+        "strength": 0.4,
+        "confidence": 0.3,
+        "saturation": 0,
+        "context": "Explicit selection from three available themes.",
+        "evidence_ids": [
+          "preference-demo-1"
+        ],
+        "last_observed": "2026-09-16T12:00:00Z"
+      }
+    ]
+  },
+  "SessionPack": {
+    "schema_version": "0.1.0",
+    "pack_id": "pack-demo-1",
+    "revision": "v1",
+    "learner_id": "learner-demo-a",
+    "graph_release_id": "reading-demo-1",
+    "policy_revision": "early-demo-1",
+    "runtime_contract": "prototype.v1",
+    "expires_at": "2026-12-31T00:00:00Z",
+    "entry_node": "intro",
+    "max_transitions": 10,
+    "nodes": [
+      {
+        "id": "intro",
+        "competency_ids": [],
+        "asset_ids": [],
+        "kind": "instruction",
+        "text": "Synthetic demonstration only.",
+        "next": "choice-1"
+      },
+      {
+        "id": "choice-1",
+        "competency_ids": [
+          "reading.en.blend-cvc"
+        ],
+        "asset_ids": [],
+        "kind": "choice",
+        "prompt": "Synthetic evaluator fixture, not a real reading assessment.",
+        "options": [
+          {
+            "id": "a",
+            "label": "A"
+          },
+          {
+            "id": "b",
+            "label": "B"
+          }
+        ],
+        "answer_id": "a",
+        "evaluator_id": "choice.v1",
+        "next_correct": "done",
+        "next_incorrect": "intro",
+        "next_unscored": "done"
+      },
+      {
+        "id": "done",
+        "competency_ids": [],
+        "asset_ids": [],
+        "kind": "end",
+        "message": "Synthetic session complete."
+      }
+    ],
+    "assets": []
+  },
+  "AuthoringIntent": {
+    "schema_version": "0.1.0",
+    "request_id": "request-demo-1",
+    "created_at": "2026-09-16T12:00:00Z",
+    "learner_ids": [
+      "learner-demo-a"
+    ],
+    "expected_snapshot_revision": "snapshot-demo-1",
+    "requested_output": "levels",
+    "count": 6,
+    "domain_id": "reading.en",
+    "target_competency_ids": [
+      "reading.en.blend-cvc"
+    ],
+    "theme": "Space",
+    "world_refs": [
+      "owl-demo"
+    ],
+    "parent_notes": "Synthetic request only.",
+    "approval_required": true,
+    "stage": "draft"
+  },
+  "StoryBrief": {
+    "schema_version": "0.1.0",
+    "brief_id": "brief-demo-1",
+    "source_session_ref": "session-demo-1",
+    "character_pack_ids": [
+      "character-demo-a"
+    ],
+    "world_refs": [
+      "owl-demo"
+    ],
+    "highlights": [
+      {
+        "id": "highlight-1",
+        "kind": "summary",
+        "origin": "parent_selected",
+        "content": "A synthetic explorer helps an owl."
+      }
+    ],
+    "child_contributions": [
+      {
+        "id": "contribution-1",
+        "kind": "quote",
+        "origin": "child_original",
+        "content": "This is synthetic text, not a real child quote."
+      }
+    ],
+    "reading_mode": "shared",
+    "constraint_profile_ref": "reading-mode-demo",
+    "requested_outputs": [
+      "digital_book"
+    ],
+    "selection_status": "parent_selected"
+  }
+}
