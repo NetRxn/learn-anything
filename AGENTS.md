@@ -3,7 +3,7 @@
 The Claude Code plugin (`learn-anything-plugin/`) and experimental FastAPI app
 (`learn-anything-app/`) are separate products. Preserve plugin semantics and its
 packaging unless the task explicitly changes them. The app is not a deployed
-learning service. Read its README and the current checkpoint plan first.
+learning service. For app changes, read its README and checkpoint plan first.
 
 Codex implementation is owner-authorized as of 2026-11-06. Earlier plan text
 requiring Opus workers is superseded. Use the available agent/model; state scope,
@@ -28,3 +28,8 @@ Historical April plans are design references, not current infrastructure authori
 
 Guidance informed by official OpenAI documentation:
 https://learn.chatgpt.com/guides/best-practices
+
+Learning sessions use `.agents/skills/learn-anything/SKILL.md` and canonical plugin
+instructions. Contributor branch/test requirements govern source changes, not
+ordinary learner sessions. Do not provision app infrastructure to use the gateway.
+Structural adapter checks: `python3 -m unittest discover -s tests -v` from repo root.

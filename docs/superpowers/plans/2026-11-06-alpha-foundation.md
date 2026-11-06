@@ -78,3 +78,14 @@ restart durability. Freeze unused OAuth until real identity mapping exists.
   recursive validation now422, valid escape text/Unicode round-trip unchanged.
 - Reviewed-fix full verification:58 passed in18.63s, coverage93%; migration replay
   and independent-process authenticated readback PASS. No provider calls.
+
+- Separate authorized adapter scope: a repository-native Codex skill gateway
+  reads canonical plugin roles/references rather than copying them; normal Codex
+  requests map to learn/train/materials/update semantics, Claude slash commands
+  stay intact. Root README separates client setup. No plugin files changed.
+- Adapter baseline: repository discovery/path tests failed with missing gateway;
+  after implementation2 structural checks passed and bundled skill-creator
+  quick_validate reported valid frontmatter. All8 canonical roles,4 command
+  files,7 schema files and referenced specialist resources resolve locally.
+  Per explicit no-modelcalls scope, no behavioral/teaching invocation validation
+  was performed; no provider or learning-outcome claim is made.

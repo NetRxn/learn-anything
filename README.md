@@ -8,7 +8,7 @@ A separate experimental [web application foundation](learn-anything-app/README.m
 implements local identity and durable documents only. It is not the browser learning
 alpha, deployed service, or a plugin release. Contributor guidance: [AGENTS.md](AGENTS.md).
 
-## Quick Start
+## Claude Code setup
 
 ### 1. Install the plugin
 
@@ -84,6 +84,48 @@ The plugin writes learner state to a `learn-anything/` directory in whatever pro
 ```
 learn-anything/
 ```
+
+## Codex setup
+
+Use an installed, signed-in Codex client with access to the cloned files.
+
+1. Clone this repository and open its root as your Codex project:
+
+   ```sh
+   git clone https://github.com/NetRxn/learn-anything.git
+   cd learn-anything
+   ```
+
+2. The gateway is in Codex's documented repository discovery location:
+   [`.agents/skills/learn-anything/SKILL.md`](.agents/skills/learn-anything/SKILL.md).
+   Keep the full repository together; the gateway reads the canonical plugin
+   instructions and references. It does not install the Claude marketplace or
+   need the experimental web app, PostgreSQL or a separate model API key.
+
+3. In Codex CLI or the IDE extension, select it with `/skills` or type:
+
+   ```text
+   $learn-anything I want to learn Python for data analysis
+   ```
+
+   Then describe your goal, experience and available time. To return, ask to
+   continue your learning program, practice, have a mentor conversation, generate
+   materials or refresh the curriculum. Use the Skills picker where your client
+   provides it. If discovery has not refreshed, restart Codex.
+
+The `/learn`, `/train`, `/materials` and `/update` commands in the guide above are
+**Claude Code commands**. The Codex gateway accepts equivalent requests in normal
+language. Both use `learn-anything/<skill-slug>/` state in the same chosen project;
+resume there and avoid simultaneous edits from two clients.
+
+This adapter has structural, frontmatter and canonical-reference validation.
+A complete Codex teaching journey and learning outcomes have **not** been validated.
+Research/rendering/export capabilities depend on tools enabled in your Codex
+session; missing capabilities must be reported rather than simulated. Python and
+`genanki` remain optional for Anki export.
+
+Discovery/invocation guidance follows the
+[official Codex skills documentation](https://developers.openai.com/codex/skills/).
 
 ## Troubleshooting
 

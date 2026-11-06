@@ -1,5 +1,5 @@
 # Skill workspaces (all runtime state, generated materials, and exports)
-learn-anything/
+/learn-anything/
 
 # Python
 __pycache__/
