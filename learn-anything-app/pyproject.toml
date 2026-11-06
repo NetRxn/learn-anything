@@ -1,0 +1,39 @@
+[project]
+name = "learn-anything"
+version = "0.1.0"
+requires-python = ">=3.14"
+dependencies = [
+    "fastapi>=0.115",
+    "uvicorn[standard]>=0.34",
+    "sqlalchemy[asyncio]>=2.0",
+    "asyncpg>=0.30",
+    "alembic>=1.14",
+    "jinja2>=3.1",
+    "python-multipart>=0.0.18",
+    "bcrypt>=4.2",
+    "authlib>=1.4",
+    "httpx>=0.28",
+    "cryptography>=44",
+    "structlog>=24",
+    "pydantic-settings>=2.7",
+    "pgvector>=0.3",
+    "itsdangerous>=2.2",
+    "psycopg[binary]>=3.2",
+    "datastar-py>=0.5",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8",
+    "pytest-asyncio>=0.24",
+    "httpx>=0.28",
+    "pytest-cov>=6",
+    "pip-audit>=2.7",
+]
+
+# NOTE: Run `pip-audit` or `uv pip audit` periodically to check for
+# compromised or vulnerable packages in the dependency tree.
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+testpaths = ["tests"]

@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block title %}Login — Learn Anything{% endblock %}
+{% block content %}
+<div class="setup-container">
+  <h1>Login</h1>
+  {% if error %}<p class="error">{{ error }}</p>{% endif %}
+  <form method="post" action="/auth/login">
+    <input name="email" type="email" placeholder="Email" required>
+    <input name="password" type="password" placeholder="Password" required>
+    <button type="submit">Login</button>
+  </form>
+  <a href="/auth/register">Create account</a>
+</div>
+{% endblock %}

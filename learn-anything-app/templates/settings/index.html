@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block title %}Settings — Learn Anything{% endblock %}
+{% block content %}
+<div class="setup-container">
+  <h1>Settings</h1>
+  <p class="subtitle">All changes take effect immediately. No server restart needed.</p>
+
+  <h2>LLM Provider</h2>
+  <form method="post" action="/settings/llm">
+    <label>API Key</label>
+    <input name="api_key" type="password" placeholder="{{ llm_key_masked }}" value="">
+    <p class="hint">Leave empty to keep current key</p>
+    <label>Model</label>
+    <select name="model">
+      <option value="claude-opus-4-6" {{ 'selected' if llm_model == 'claude-opus-4-6' }}>Claude Opus 4</option>
+      <option value="claude-sonnet-4-6" {{ 'selected' if llm_model == 'claude-sonnet-4-6' }}>Claude Sonnet 4</option>
+      <option value="claude-haiku-4-5-20251001" {{ 'selected' if llm_model == 'claude-haiku-4-5-20251001' }}>Claude Haiku 4</option>
+    </select>
+    <button type="submit">Save</button>
+  </form>
+
+  <h2>Authentication</h2>
+  <form method="post" action="/settings/auth">
+    <label><input type="checkbox" name="single_user" {{ 'checked' if single_user }}> Single User Mode</label>
+    <h3>Google OAuth</h3>
+    <label>Client ID</label>
+    <input name="google_client_id" placeholder="{{ 'Configured' if google_configured else 'Not configured' }}">
+    <label>Client Secret</label>
+    <input name="google_client_secret" type="password" placeholder="{{ 'Configured' if google_configured else 'Not configured' }}">
+    <h3>GitHub OAuth</h3>
+    <label>Client ID</label>
+    <input name="github_client_id" placeholder="{{ 'Configured' if github_configured else 'Not configured' }}">
+    <label>Client Secret</label>
+    <input name="github_client_secret" type="password" placeholder="{{ 'Configured' if github_configured else 'Not configured' }}">
+    <button type="submit">Save</button>
+  </form>
+</div>
+{% endblock %}

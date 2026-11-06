@@ -30,7 +30,10 @@ The web app replaces the Claude Code CLI interface with a visual, multi-modal le
 - **PGVector** — Embedding similarity for transfer detection
 
 ### Database
-- **PostgreSQL** with AGE and PGVector extensions — bundled via Docker Compose
+- **PostgreSQL** with AGE and PGVector extensions (primary, full features)
+- **JSON file backend** (fallback, single-user, degraded — no cross-skill transfer, no graph traversal queries, no multi-user)
+- Backend selection via setup wizard; import/export between backends so users aren't locked in
+- Custom Docker image required: build from `pgvector/pgvector:pg16` base, add AGE extension
 
 ### LLM Integration
 - **MVP:** Claude Agent SDK (primary provider, system designed for Claude)
@@ -44,11 +47,29 @@ The web app replaces the Claude Code CLI interface with a visual, multi-modal le
 - Network-only for real-time (SSE streams, training sessions)
 - Background sync for offline flashcard review data
 
-### Authentication
+### Authentication & Sessions
 - Local accounts with bcrypt + per-user salts (always on, zero-config)
 - OAuth2 providers (Google, GitHub) activate when credentials are configured via web UI
 - `SINGLE_USER=true` mode skips login page for personal deployments
-- All secrets encrypted at rest with AES-256-GCM
+- All secrets encrypted at rest with AES-256-GCM, encryption key auto-generated on first run, stored in Docker volume (or Ansible vault for managed infrastructure)
+- Sessions: httponly secure cookies with server-side session store. SSE streams authenticate on initial connect via session cookie. Session timeout configurable (default 7 days).
+
+### State Backend
+
+Two pluggable backends behind a shared `StateBackend` protocol. User chooses during setup; import/export enables switching without data loss.
+
+**PostgreSQL (recommended):** Full feature set — cross-skill transfer detection (PGVector), graph traversal (AGE), multi-user, aggregate queries for Progress dashboard.
+
+**JSON files (local mode):** Single-user, single-skill graphs loaded into memory. No cross-skill transfer, no graph traversal queries, no multi-user. Suitable for quick evaluation or offline use. Subtle banner: "Running in local mode — connect to PostgreSQL for the full experience."
+
+```python
+class StateBackend(Protocol):
+    async def read_graph(self, skill_slug) -> KnowledgeGraph: ...
+    async def write_graph(self, skill_slug, graph) -> None: ...
+    async def query_transfer(self, embeddings) -> list[TransferMatch]: ...
+    async def export_json(self, skill_slug) -> dict: ...
+    async def import_json(self, skill_slug, data: dict) -> None: ...
+```
 
 ---
 
@@ -305,7 +326,13 @@ The orchestrator routes based on which state files exist. Each skill writes its 
 - Materials count appears in panel, Anki export offered
 - Output: `srs-cards.json` + `materials/`
 
-**Transition to Learning:** Dashboard presented (Explore mode), curriculum shown, first training session offered. All modes unlocked.
+**Phase 6: Progress Dashboard**
+- Progress Mode becomes available — metrics computed server-side (PG: SQL/AGE queries; JSON: in-memory from loaded state)
+- PG mode: rich aggregate queries (cross-skill coverage, retention trends, transfer success rates)
+- JSON mode: simplified dashboard from single-skill in-memory state
+- This replaces the plugin's Dashboard Generator skill — the web frontend subsumes it
+
+**Transition to Learning:** Explore mode presented, curriculum shown, first training session offered. All modes unlocked. Training Conductor writes `progress.json` (JSON backend) or progress records (PG backend) after each session.
 
 **No artificial stops.** The orchestrator manages transitions. The UI reflects the state machine — it doesn't impose its own flow.
 
@@ -397,10 +424,20 @@ For large cross-skill graphs, server computes layout (via AGE or layout algorith
 
 ## 9. Schema Migration
 
-The existing plugin schemas need these additions for the three-layer architecture:
+### Migration Tooling
+- **Alembic** for SQLAlchemy schema migrations, versioned in `alembic/versions/`
+- Migrations run automatically on application startup (`alembic upgrade head`)
+- Self-hosters upgrading: `docker compose pull && docker compose up` triggers auto-migration
+- Rollback supported via `alembic downgrade`
+
+### Edge Type Mapping (existing → new)
+- `RELATED` → `SIMILAR_TO` (with cosine similarity field added)
+- `REINFORCEMENT` → `REINFORCES` (renamed for consistency)
+- `PREREQUISITE` → `PREREQUISITE` (unchanged)
+- New: `EMBODIES`, `GENERALIZES`, `NEGATIVE_TRANSFER`, `SOURCED_FROM`, `TEACHES`, `PREREQUISITE_MATERIAL`, `CITES`
 
 ### What's Covered (no changes needed)
-- Skill graph (vertices with Concept/Skill labels, edges with PREREQUISITE/RELATED/REINFORCEMENT)
+- Skill graph vertices (Concept/Skill labels, bloom_level, frequency/impact scores)
 - Learner state overlay (mastery_probability, BKT, FSRS, confidence, evidence tracking)
 - Transfer metadata (transfer_coefficient, transfer_boost, transfer_pathways)
 - Mastery transition audit trail
@@ -424,13 +461,54 @@ services:
     build: .
     ports: ["8000:8000"]
     depends_on: [db]
+    environment:
+      - DATABASE_URL=postgresql://learn_anything:${LA_DB_PASSWORD}@db:5432/learn_anything
     
   db:
-    image: apache/age  # Postgres + AGE + PGVector
+    build: ./docker/postgres  # Custom: pgvector base + AGE extension
     volumes: ["pgdata:/var/lib/postgresql/data"]
+    environment:
+      - POSTGRES_DB=learn_anything
+      - POSTGRES_USER=learn_anything
+      - POSTGRES_PASSWORD=${LA_DB_PASSWORD}
 ```
 
-Quick Setup bundles everything. Custom Setup supports external Postgres.
+**Three deployment paths:**
+
+1. **Quick Setup (Docker Compose, bundled):** Everything in one `docker-compose.yml` — app + custom PG image with AGE/PGVector. Single user, minimal config. Good for evaluation.
+
+2. **Custom Setup (Docker Compose, external PG):** User provides connection string to their own PostgreSQL instance. Setup wizard verifies AGE and PGVector extensions. Multi-user, OAuth.
+
+3. **Managed Infrastructure:** For operators running shared PostgreSQL alongside other apps. The application connects to an existing PG instance (dedicated database + user), sits behind an existing reverse proxy (Caddy, nginx, etc.), and is deployed via the operator's existing tooling (Ansible, Terraform, etc.). The app ships as a single Docker image (`learn-anything:latest`) that takes a `DATABASE_URL` and standard environment variables. No bundled database. Deployment playbooks/templates are maintained separately in the operator's infrastructure repo, not in this project.
+
+**Managed infrastructure requirements:**
+- PostgreSQL 17+ with AGE and PGVector extensions enabled
+- Dedicated database and user (not shared with other apps)
+- Connection pooling recommended (PgBouncer in transaction mode)
+- Reverse proxy must not buffer SSE streams (`proxy_buffering off` for nginx, automatic for Caddy)
+- Health check endpoint: `GET /health`
+
+### Backup & Restore
+- **PG backend:** `pg_dump` via `/settings/backup` page (admin only). Scheduled backups configurable. Download as `.sql.gz`.
+- **JSON backend:** Export all state files as `.zip` from `/settings/backup`.
+- **Import:** Upload backup file via `/settings/restore`. PG backend runs `pg_restore`; JSON backend extracts to state directory.
+- **Cross-backend migration:** Export from JSON → Import to PG (or vice versa) via the same JSON schema format. The `StateBackend.export_json()` / `import_json()` methods ensure format compatibility.
+
+### Observability
+- **Logging:** Python `structlog` with JSON output. Log level configurable via settings (`DEBUG` / `INFO` / `WARNING`). Logs to stdout (Docker captures).
+- **Health check:** `GET /health` returns `200` with backend status (DB connected, LLM provider configured, extension versions). Used by Docker `healthcheck` and external monitoring.
+- **Error recovery:** Pipeline stages are idempotent — if an LLM call fails mid-phase, the state file is not written, so the orchestrator retries the same phase on next interaction. After 2 consecutive failures, the system falls back to a simplified version of the phase and notifies the user.
+
+### CORS & Reverse Proxy
+- Same-origin by default (frontend and API served from same FastAPI instance).
+- For reverse proxy deployments (nginx, Caddy): SSE requires `proxy_buffering off` (nginx) or equivalent. Document in deployment guide.
+- Configurable `ALLOWED_ORIGINS` for split deployments.
+
+### Rate Limiting
+- Per-user LLM call budget: configurable requests/hour and tokens/day in `/settings`.
+- Admin can set default budgets and per-user overrides.
+- Budget exhaustion shows graceful message, not a crash. Resets on schedule.
+- Cost tracking displayed in Progress mode (optional, disabled by default).
 
 ---
 
@@ -466,11 +544,14 @@ Monaco embeds as another `data-ignore-morph` island. Judge0 runs as a Docker ser
 
 ## 12. Security Considerations
 
-- All API keys and OAuth secrets encrypted at rest (AES-256-GCM)
+- All API keys and OAuth secrets encrypted at rest (AES-256-GCM). Encryption key auto-generated on first run, stored in persistent volume (`/data/encryption.key`). If key is lost, encrypted secrets must be re-entered via setup wizard. Key rotation: generate new key, re-encrypt all secrets, atomic swap.
 - Passwords: bcrypt with per-user salts, never stored plaintext
 - Datastar expressions use `Function()` constructors — requires `unsafe-eval` in CSP
 - Signal values visible in source — never put secrets in signals
 - All user input validated server-side
+- Database: dedicated user and database (`learn_anything`), not shared with other applications. Connection string configurable for managed infrastructure (Ansible vaults, etc.)
+- Per-user LLM rate limiting to prevent budget exhaustion in multi-user deployments
+- SSE streams authenticated via session cookie on connect; no secret data in SSE event payloads
 - Judge0 (when added) runs code in isolated containers
 - LiteLLM deferred due to 2026-03-24 PyPI supply chain attack (TeamPCP). Resume integration once maintainer security hardening is confirmed.
 
@@ -480,5 +561,6 @@ Monaco embeds as another `data-ignore-morph` island. Judge0 runs as a Docker ser
 
 - Celestial background image licensing (ESA Gaia data is CC BY-SA 4.0 — verify terms for self-hosted open-source distribution)
 - Datastar LLM training gap — team acknowledges models fall back to SPA patterns. Mitigation: comprehensive Datastar docs page fed into LLM context during development, plus Ben's getting-started guide as required reading before implementation.
-- AGE Docker image maturity — verify that the bundled AGE+PGVector image is production-ready for self-hosters
+- Custom Docker image build: verify that AGE compiles cleanly on `pgvector/pgvector:pg16` base, document the Dockerfile
 - Voice input/output API selection for Train mode (Web Speech API vs. third-party STT/TTS)
+- PWA service worker invalidation strategy on backend updates — ensure cached frontend fragments don't mismatch new SSE event formats

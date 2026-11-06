@@ -1,0 +1,32 @@
+# docker-compose.dev.yml — Development on devtest VM or local with shared PG
+# DB is external (shared PG on devtest VM). App only, with hot-reload.
+services:
+  app:
+    build:
+      context: .
+      target: builder  # Use builder stage for dev (has all deps)
+    ports: ["8000:8000"]
+    environment:
+      - LA_DATABASE_URL=${LA_DATABASE_URL}  # Set in .env or shell
+      - LA_STATE_BACKEND=postgres
+      - LA_SECRET_KEY=${LA_SECRET_KEY:-dev-secret}
+      - LA_LOG_LEVEL=DEBUG
+    volumes:
+      - .:/app:rw          # Mount source for hot-reload
+      - app_data:/app/data
+    command: ["uvicorn", "app.main:app", "--reload", "--host", "0.0.0.0", "--port", "8000"]
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+    networks:
+      - cluster-network
+
+networks:
+  cluster-network:
+    external: true  # Pre-existing network for managed infrastructure
+
+volumes:
+  app_data:

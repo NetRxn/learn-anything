@@ -12,3 +12,14 @@ __pycache__/
 # VSCode
 .vscode/
 .superpowers/*
+
+# Application private/runtime state
+.checkpoint/
+.venv/
+.env
+.env.*
+.pytest_cache/
+.coverage
+htmlcov/
+learn-anything-app/data/
+docs/plans/INFRASTRUCTURE.md
