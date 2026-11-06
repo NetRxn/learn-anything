@@ -10,10 +10,10 @@ async def test_login_page_renders(client):
 
 
 @pytest.mark.asyncio
-async def test_register_creates_user(client):
+async def test_public_registration_disabled(client):
     resp = await client.post("/auth/register", data={
         "email": "new@example.com",
         "display_name": "New User",
         "password": "strong-password-123",
     }, follow_redirects=False)
-    assert resp.status_code in (302, 303)
+    assert resp.status_code == 404

@@ -1,15 +1,14 @@
-# docker-compose.dev.yml — Development on devtest VM or local with shared PG
-# DB is external (shared PG on devtest VM). App only, with hot-reload.
+# Local-only development example; container behavior is unverified.
+# Requires a dedicated disposable/local database; no managed service admission.
 services:
   app:
     build:
       context: .
       target: builder  # Use builder stage for dev (has all deps)
-    ports: ["8000:8000"]
+    ports: ["127.0.0.1:8000:8000"]
     environment:
       - LA_DATABASE_URL=${LA_DATABASE_URL}  # Set in .env or shell
       - LA_STATE_BACKEND=postgres
-      - LA_SECRET_KEY=${LA_SECRET_KEY:-dev-secret}
       - LA_LOG_LEVEL=DEBUG
     volumes:
       - .:/app:rw          # Mount source for hot-reload
@@ -21,12 +20,5 @@ services:
       timeout: 10s
       retries: 3
       start_period: 10s
-    networks:
-      - cluster-network
-
-networks:
-  cluster-network:
-    external: true  # Pre-existing network for managed infrastructure
-
 volumes:
   app_data:

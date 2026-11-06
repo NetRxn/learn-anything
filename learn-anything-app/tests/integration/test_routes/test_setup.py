@@ -1,16 +1,14 @@
-# NOTE: Uses shared `client` fixture from tests/conftest.py
 import pytest
 
 
 @pytest.mark.asyncio
-async def test_setup_welcome_renders(client):
-    resp = await client.get("/setup")
-    assert resp.status_code == 200
-    assert "Learn Anything" in resp.text
+async def test_setup_locked_after_first_admin(client):
+    assert (await client.get("/setup")).status_code == 409
 
 
 @pytest.mark.asyncio
-async def test_setup_steps_render(client):
-    for step in ["database", "llm", "auth", "account"]:
-        resp = await client.get(f"/setup/{step}")
-        assert resp.status_code == 200
+async def test_unimplemented_setup_wizard_routes_not_exposed(client):
+    for step in ["database", "llm", "auth"]:
+        assert (await client.get(f"/setup/{step}")).status_code == 404
+
+    assert (await client.get("/setup/account")).status_code == 405

@@ -1,6 +1,7 @@
 # app/security/encryption.py
 import base64
 import os
+import tempfile
 from pathlib import Path
 from cryptography.hazmat.primitives.ciphers.aead import AESGCM
 
@@ -11,12 +12,25 @@ class SecretStore:
         self._key = self._load_or_generate_key()
 
     def _load_or_generate_key(self) -> bytes:
-        if self._key_path.exists() and self._key_path.stat().st_size > 0:
-            return self._key_path.read_bytes()
-        key = AESGCM.generate_key(bit_length=256)
-        self._key_path.parent.mkdir(parents=True, exist_ok=True)
-        self._key_path.write_bytes(key)
-        self._key_path.chmod(0o600)
+        self._key_path.parent.mkdir(parents=True, exist_ok=True, mode=0o700)
+        if not self._key_path.exists():
+            key = AESGCM.generate_key(bit_length=256)
+            fd, temporary = tempfile.mkstemp(dir=self._key_path.parent)
+            try:
+                with os.fdopen(fd, "wb") as stream:
+                    stream.write(key)
+                    stream.flush()
+                    os.fsync(stream.fileno())
+                try:
+                    # Publish a complete key without replacing a concurrent winner.
+                    os.link(temporary, self._key_path)
+                except FileExistsError:
+                    pass
+            finally:
+                os.unlink(temporary)
+        key = self._key_path.read_bytes()
+        if len(key) != 32:
+            raise ValueError("Encryption key must contain exactly 32 bytes")
         return key
 
     def encrypt(self, plaintext: str) -> str:

@@ -8,17 +8,16 @@ class PostgresBackend:
         self._session_factory = session_factory
 
     async def read_graph(self, skill_slug: str) -> dict:
-        # Full implementation in Plan 2
-        return {}
+        raise NotImplementedError("PostgreSQL graph engine is outside the foundation checkpoint")
 
     async def write_graph(self, skill_slug: str, graph: dict) -> None:
-        pass  # Full implementation in Plan 2
+        raise NotImplementedError("PostgreSQL graph engine is outside the foundation checkpoint")
 
     async def query_transfer(self, embeddings: list[float]) -> list[TransferMatch]:
-        return []  # Full implementation in Plan 2
+        raise NotImplementedError("PostgreSQL graph engine is outside the foundation checkpoint")
 
     async def export_json(self, skill_slug: str) -> dict:
-        return {}  # Full implementation in Plan 2
+        raise NotImplementedError("PostgreSQL graph engine is outside the foundation checkpoint")
 
     async def import_json(self, skill_slug: str, data: dict) -> None:
-        pass  # Full implementation in Plan 2
+        raise NotImplementedError("PostgreSQL graph engine is outside the foundation checkpoint")

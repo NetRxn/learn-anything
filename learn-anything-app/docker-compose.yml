@@ -1,16 +1,16 @@
+# Historical self-hosting design; not built/qualified by the foundation checkpoint.
 # docker-compose.yml — Self-hosted deployment (bundles PG for convenience)
 # For devtest/managed infrastructure, use docker-compose.dev.yml instead
 services:
   app:
     build: .
-    ports: ["8000:8000"]
+    ports: ["127.0.0.1:8000:8000"]
     depends_on:
       db:
         condition: service_healthy
     environment:
-      - LA_DATABASE_URL=postgresql+asyncpg://learn_anything:${LA_DB_PASSWORD:-devpassword}@db:5432/learn_anything
+      - LA_DATABASE_URL=postgresql+asyncpg://learn_anything:${LA_DB_PASSWORD:?Set a dedicated local database password}@db:5432/learn_anything
       - LA_STATE_BACKEND=postgres
-      - LA_SECRET_KEY=${LA_SECRET_KEY:-change-me-in-production}
     volumes:
       - app_data:/app/data
     healthcheck:
@@ -27,7 +27,7 @@ services:
     environment:
       - POSTGRES_DB=learn_anything
       - POSTGRES_USER=learn_anything
-      - POSTGRES_PASSWORD=${LA_DB_PASSWORD:-devpassword}
+      - POSTGRES_PASSWORD=${LA_DB_PASSWORD:?Set a dedicated local database password}
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U learn_anything"]
       interval: 10s

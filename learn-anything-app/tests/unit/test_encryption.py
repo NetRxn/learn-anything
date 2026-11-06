@@ -6,6 +6,7 @@ from app.security.encryption import SecretStore
 def test_encrypt_decrypt_roundtrip():
     with tempfile.NamedTemporaryFile(delete=False, suffix=".key") as f:
         key_path = f.name
+    os.unlink(key_path)
     try:
         store = SecretStore(key_path)
         plaintext = "sk-ant-api03-very-secret-key"
@@ -31,6 +32,7 @@ def test_key_auto_generated():
 def test_different_encryptions_differ():
     with tempfile.NamedTemporaryFile(delete=False, suffix=".key") as f:
         key_path = f.name
+    os.unlink(key_path)
     try:
         store = SecretStore(key_path)
         e1 = store.encrypt("same")
@@ -38,3 +40,24 @@ def test_different_encryptions_differ():
         assert e1 != e2  # Different nonces
     finally:
         os.unlink(key_path)
+
+
+def test_concurrent_first_use_keeps_all_secrets_decryptable(tmp_path, monkeypatch):
+    from concurrent.futures import ThreadPoolExecutor
+    from threading import Barrier
+    from cryptography.hazmat.primitives.ciphers.aead import AESGCM
+    barrier = Barrier(2)
+    original = AESGCM.generate_key
+
+    def simultaneous_keys(bit_length):
+        key = original(bit_length)
+        barrier.wait(timeout=5)
+        return key
+
+    monkeypatch.setattr(AESGCM, "generate_key", simultaneous_keys)
+    path = str(tmp_path / "key")
+    with ThreadPoolExecutor(2) as pool:
+        stores = list(pool.map(lambda _: SecretStore(path), range(2)))
+    tokens = [s.encrypt("retained secret") for s in stores]
+    persisted = SecretStore(path)
+    assert [persisted.decrypt(token) for token in tokens] == ["retained secret", "retained secret"]

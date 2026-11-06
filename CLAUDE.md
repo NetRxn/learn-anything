@@ -1,3 +1,7 @@
+> Current contributor authority: `AGENTS.md`, application README, and the November
+> foundation checkpoint plan. The app is a separate experimental product; the
+> historical plugin-only layout below does not describe its status.
+
 # CLAUDE.md
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
@@ -8,12 +12,15 @@ A Claude Code plugin marketplace containing `learn-anything` — a meta-learning
 
 ## Repository Layout
 
-This is a **Claude Code plugin marketplace repo**, not a traditional application. There is no build system, test suite, or linting.
+The plugin is a **Claude Code plugin marketplace** with prompt/schema validation.
+A separate experimental FastAPI application now lives in `learn-anything-app/`;
+it has pytest tests and explicit Alembic migrations. Follow its README and the
+current checkpoint plan before running anything.
 
 - `.claude-plugin/marketplace.json` — Marketplace manifest (top-level, lists available plugins)
 - `learn-anything-plugin/` — The single plugin in this marketplace
   - `.claude-plugin/plugin.json` — Plugin manifest (name, version, description)
-  - `commands/` — Two slash commands: `/learn` and `/train` (both `.md` files)
+  - `commands/` — Four slash commands: `/learn`, `/train`, `/materials`, `/update` (both `.md` files)
   - `skills/` — 8 skill directories, each with a `SKILL.md` and optional `references/`
   - `schemas/` — 7 JSON schemas defining the contract between pipeline components
 - `docs/` — Architecture spec, implementation plan, and research materials
@@ -50,7 +57,7 @@ The **dual-layer knowledge graph** (`knowledge-graph.json`) is the system's core
 
 The gap between these layers *is* the curriculum.
 
-## Only Code: generate_anki.py
+## Plugin export script: generate_anki.py
 
 The single Python script lives at `learn-anything-plugin/skills/material-forge/scripts/generate_anki.py`. It exports `srs-cards.json` to `.apkg` for Anki import.
 

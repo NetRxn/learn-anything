@@ -4,14 +4,18 @@ A Claude Code plugin marketplace containing **learn-anything** — a meta-learni
 
 See [learn-anything-plugin/README.md](learn-anything-plugin/README.md) for full plugin documentation.
 
+A separate experimental [web application foundation](learn-anything-app/README.md)
+implements local identity and durable documents only. It is not the browser learning
+alpha, deployed service, or a plugin release. Contributor guidance: [AGENTS.md](AGENTS.md).
+
 ## Quick Start
 
 ### 1. Install the plugin
 
-**From a private GitHub repo** (requires repo access):
+**From GitHub:**
 
 ```bash
-# Use the full HTTPS URL for private repos (owner/repo shorthand only works for public repos)
+# Add the marketplace by its HTTPS URL
 claude plugin marketplace add https://github.com/NetRxn/learn-anything.git
 ```
 
@@ -95,11 +99,8 @@ git ls-remote https://github.com/NetRxn/learn-anything.git
 gh auth login
 ```
 
-For **background auto-updates** to work (when Claude Code refreshes plugins without user interaction), set a token in your shell profile (`~/.zshrc` or `~/.bashrc`):
-
-```bash
-export GITHUB_TOKEN=ghp_your_token_here
-```
+Use normal GitHub/Git credential management when access is required. Do not add
+broad personal tokens to shell profiles as a plugin setup step.
 
 ### Common errors
 

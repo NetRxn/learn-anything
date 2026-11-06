@@ -44,6 +44,7 @@ async def test_set_config_encrypted(db):
     import tempfile, os
     with tempfile.NamedTemporaryFile(delete=False, suffix=".key") as f:
         key_path = f.name
+    os.unlink(key_path)
     try:
         store = SecretStore(key_path)
         await set_config(db, "secret", "my-api-key", encrypted=True, secret_store=store)
@@ -55,3 +56,10 @@ async def test_set_config_encrypted(db):
         assert decrypted == "my-api-key"
     finally:
         os.unlink(key_path)
+
+
+@pytest.mark.asyncio
+async def test_encrypted_config_without_key_store_is_rejected(db):
+    with pytest.raises(ValueError, match="SecretStore"):
+        await set_config(db, "private_key", "must-not-persist", encrypted=True)
+    assert await get_config(db, "private_key") is None

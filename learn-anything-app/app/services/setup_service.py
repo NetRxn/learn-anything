@@ -22,6 +22,8 @@ async def get_config(db: AsyncSession, key: str, secret_store: SecretStore | Non
 
 
 async def set_config(db: AsyncSession, key: str, value: str, encrypted: bool = False, secret_store: SecretStore | None = None):
+    if encrypted and secret_store is None:
+        raise ValueError("SecretStore required for encrypted configuration")
     stored_value = value
     if encrypted and secret_store:
         stored_value = secret_store.encrypt(value)

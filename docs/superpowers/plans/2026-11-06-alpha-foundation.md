@@ -47,3 +47,26 @@ restart durability. Freeze unused OAuth until real identity mapping exists.
   cover core PG only. Graph readiness remains unverified.
 - Read-only cached Python runtime copied into ignored local scratch; no package
   installation, provider calls or shared database access.
+
+- Task1 complete: snapshot commit `0c84876`, sanitized public plan import and current
+  AGENTS/conventions. No private runbook, environment or learner data copied.
+- Task2: setup persisted-user assertion failed on old303/no-write behavior.
+  New factory tests then failed on absent factory; later cases caught plaintext
+  encrypted-config writes, concurrent key loss, silent graph stubs, invalid JSON
+  and integer500s, and lost-key replacement. All corrected before final suite.
+- Ruling: ordinary server HTML/API replaces unused placeholder Datastar/OAuth
+  surfaces in this checkpoint. No learning UI or provider execution is claimed.
+- Ruling: reject corrupt/empty key files rather than silently rotate them; old
+  tempfile fixtures updated to create missing paths. Concurrent publication uses
+  a complete0600 file and atomic hard-link, preventing first-use key loss.
+- Ruling: plain isolated PG validates identity/document persistence only. Existing
+  graph model tests validate relational schema, not AGE/PGVector functionality.
+- Migration upgrade→base→head and independent-process save/resume are run by the
+  disposable runner. All generated DBs/tokens/keys are temporary and excluded.
+- Final validation: disposable PG17 upgrade→base→head succeeded; independent
+  process authenticated readback PASS; full suite54 passed in21.31s. New
+  foundation/model/encryption coverage93%. Unit-only9 passed in1.36s without DB.
+  No-DB full run15 passed/35 skipped before the four additional PG boundary cases.
+- Dependency security audit was not run (no advisory service/network access used).
+  Containers, extension engine, browser layout, infra, deployment and owner
+  acceptance are unverified. Parent independent review precedes push/merge.

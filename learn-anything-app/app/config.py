@@ -7,7 +7,7 @@ class Settings(BaseSettings):
     state_backend: str = "json"  # "postgres" or "json"
     json_state_dir: str = "data/state"
     encryption_key_path: str = "data/encryption.key"
-    secret_key: str = "change-me-on-first-run"
+    secret_key: str = ""  # Legacy helper only; HTTP sessions use DB-backed random tokens
     session_max_age: int = 7 * 24 * 3600  # 7 days
     single_user: bool = False
     log_level: str = "INFO"
@@ -16,7 +16,7 @@ class Settings(BaseSettings):
     anthropic_model: str = "claude-sonnet-4-6"
     setup_complete: bool = False
 
-    model_config = {"env_prefix": "LA_", "env_file": ".env"}
+    model_config = {"env_prefix": "LA_", "extra": "ignore"}
 
 
 settings = Settings()

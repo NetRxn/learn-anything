@@ -1,6 +1,7 @@
 # alembic/env.py
 from alembic import context
 from app.models.base import Base
+from app.models.workspace import LoginSession, WorkspaceDocument  # noqa
 from app.models.user import User  # noqa
 from app.models.config import AppConfig  # noqa
 from app.models.graph_nodes import Concept, SkillNode, Domain  # noqa
