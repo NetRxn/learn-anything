@@ -89,3 +89,11 @@ restart durability. Freeze unused OAuth until real identity mapping exists.
   files,7 schema files and referenced specialist resources resolve locally.
   Per explicit no-modelcalls scope, no behavioral/teaching invocation validation
   was performed; no provider or learning-outcome claim is made.
+
+- Independent root verification: disposable PG run58 passed in18.76s; migration
+  replay and fresh-process authenticated readback passed. Reviewer approved the
+  migration/JSONB fixes plus adapter structural checks and10 unit tests.
+- Final docs-only cleanup reconciles root README's four Claude commands, optional
+  export dependency, conditional private-fork authentication and dual-client
+  product description. Canonical plugin files remain unchanged. Push/merge have
+  not been performed by this implementation worker; no release tags created.

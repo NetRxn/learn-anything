@@ -1,6 +1,8 @@
 # learn-anything
 
-A Claude Code plugin marketplace containing **learn-anything** — a meta-learning system that helps people learn any skill efficiently through adaptive assessment, curriculum design, spaced repetition, and interactive training.
+**Learn Anything** is a learning system with an existing Claude Code plugin and
+a repository-native Codex skill gateway. Both use the canonical learning roles,
+references and file-based state for assessment, curriculum, materials and practice.
 
 See [learn-anything-plugin/README.md](learn-anything-plugin/README.md) for full plugin documentation.
 
@@ -45,18 +47,13 @@ After adding the marketplace, enable the plugin when prompted. You can verify wi
 
 The `learn-anything` plugin should appear in your installed plugins list with 8 auto-discovered skills.
 
-### 3. Install Python dependency (for Anki export)
+### 3. Optional Python dependency for Anki export
 
-The Material Forge skill exports flashcard decks to Anki. This requires `genanki`:
-Still un-vetted, genanki is inactive x 2yrs, lots of other options out there. consider this a placeholder.
-
-```bash
-# Using uv (recommended)
-uv pip install genanki
-
-# Or using pip
-pip install genanki
-```
+The Material Forge's Anki exporter uses Python and `genanki`; see the plugin's
+[export requirements](learn-anything-plugin/requirements.txt). Install these in
+an isolated Python environment if you want deck export. They are not required
+for the rest of the learning workflow. No dependency security assessment is
+claimed here.
 
 ### 4. Start learning
 
@@ -68,12 +65,14 @@ pip install genanki
 
 Or say it naturally — "I want to learn Spanish", "teach me guitar" — the orchestrator skill activates automatically.
 
-Two commands handle everything:
+Four Claude Code commands provide the learning entry points:
 
 | Command | Purpose |
 |---|---|
 | `/learn [topic or context]` | Start, resume, or manage any skill |
-| `/train [context]` | Jump straight into a training session |
+| `/train [context or --mode mentor]` | Practice or have a mentor conversation |
+| `/materials [type] [task-class]` | Generate missing or requested materials |
+| `/update [changes or full refresh]` | Refresh an existing curriculum |
 
 `/learn` delegates to the orchestrator — just describe what you want naturally (e.g., `/learn progress`, `/learn switch guitar`, `/learn I'm stuck on X`).
 
@@ -129,15 +128,16 @@ Discovery/invocation guidance follows the
 
 ## Troubleshooting
 
-### Private repo authentication errors
+### Authentication for a private fork
 
-For private repos, Claude Code uses your existing git credentials. Verify access first:
+The public NetRxn repository does not require private-repository access. If you
+use a private fork, verify its URL and your existing Git credentials:
 
 ```bash
 # Check that you can reach the repo
-git ls-remote https://github.com/NetRxn/learn-anything.git
+git ls-remote <your-private-fork-url>
 
-# If that fails, authenticate with GitHub CLI
+# If access requires authentication, use your normal GitHub setup
 gh auth login
 ```
 
@@ -148,7 +148,7 @@ broad personal tokens to shell profiles as a plugin setup step.
 
 | Error | Fix |
 |---|---|
-| Authentication fails | Use full HTTPS URL, not `owner/repo` shorthand. Run `gh auth login` first. |
+| Private-fork authentication fails | Verify the fork URL and Git access; authenticate for that fork if required. |
 | Marketplace not found | Ensure `.claude-plugin/marketplace.json` exists at repo root and is pushed to remote. |
 | Plugin not loading | Run `/plugin` and check if the marketplace is listed. Try `/plugin marketplace update`. |
 | Git timeout on large repo | Set `export CLAUDE_CODE_PLUGIN_GIT_TIMEOUT_MS=300000` in your shell profile. |
@@ -167,10 +167,12 @@ claude plugin validate .
 learn-anything/
 ├── .claude-plugin/
 │   └── marketplace.json         ← Marketplace manifest (lists available plugins)
-├── learn-anything-plugin/       ← The plugin
+├── .agents/skills/learn-anything/ ← Codex gateway to canonical plugin instructions
+├── learn-anything-app/          ← Experimental identity/document foundation
+├── learn-anything-plugin/       ← The Claude Code plugin
 │   ├── .claude-plugin/
 │   │   └── plugin.json          ← Plugin manifest
-│   ├── commands/                ← /learn and /train commands
+│   ├── commands/                ← /learn, /train, /materials, /update
 │   ├── skills/                  ← 8 auto-discovered skills
 │   │   ├── orchestrator/
 │   │   ├── domain-assessor/
