@@ -38,6 +38,17 @@ def digest(token):
     return hashlib.sha256(token.encode()).hexdigest()
 
 
+def jsonb_strings_supported(value):
+    """PG JSONB cannot represent NUL or unpaired UTF-16 surrogate codepoints."""
+    if isinstance(value, str):
+        return "\x00" not in value and not any(0xD800 <= ord(char) <= 0xDFFF for char in value)
+    if isinstance(value, dict):
+        return all(jsonb_strings_supported(key) and jsonb_strings_supported(item) for key, item in value.items())
+    if isinstance(value, list):
+        return all(jsonb_strings_supported(item) for item in value)
+    return True
+
+
 def create_app(config: Settings, session_factory=None):
     @asynccontextmanager
     async def lifespan(app):
@@ -219,6 +230,8 @@ def create_app(config: Settings, session_factory=None):
 
     @app.put("/api/workspaces/{skill_slug}/{document}")
     async def write_document(skill_slug: Slug, document: Kind, payload: DocumentWrite, user: User = Depends(current_user)):
+        if not jsonb_strings_supported(payload.data):
+            raise HTTPException(422, "Document contains strings unsupported by PostgreSQL JSONB")
         try:
             size = len(json.dumps(payload.data, allow_nan=False).encode())
         except ValueError:

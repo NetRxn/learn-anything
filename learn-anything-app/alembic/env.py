@@ -17,7 +17,9 @@ if settings.database_url:
     sync_url = settings.database_url.replace("+asyncpg", "").replace(
         "postgresql://", "postgresql+psycopg://"
     )
-    config.set_main_option("sqlalchemy.url", sync_url)
+    # ConfigParser interpolates percent signs. Escape only for storage; its
+    # get_section() restores the exact encoded URL before SQLAlchemy sees it.
+    config.set_main_option("sqlalchemy.url", sync_url.replace("%", "%%"))
 
 target_metadata = Base.metadata
 

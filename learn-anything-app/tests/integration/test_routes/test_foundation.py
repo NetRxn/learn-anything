@@ -161,3 +161,18 @@ async def test_storage_boundaries_and_missing_encryption_key_fail_closed(fresh, 
         await client.post("/settings/llm", data={"api_key": "first-key", "model": "example"})
         Path(app.state.config.encryption_key_path).unlink()
         assert (await client.post("/settings/llm", data={"api_key": "replacement", "model": "example"})).status_code == 503
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize("data", [{"value": "contains\x00nul"}, {"bad\x00key": "value"}, {"nested": [{"value": "\ud800"}]}])
+async def test_jsonb_unrepresentable_strings_are_rejected_without_db_error(fresh, data):
+    client, _ = fresh
+    await client.post("/setup/account", data=ACCOUNT)
+    await client.post("/auth/login", data=ACCOUNT)
+    import json
+    response = await client.put("/api/workspaces/python/graph", content=json.dumps({"revision": 0, "data": data}), headers={"Content-Type": "application/json"})
+    assert response.status_code == 422
+    assert (await client.get("/api/workspaces/python/graph")).status_code == 404
+    valid = {"literal": r"\u0000", "unicode": "😀"}
+    assert (await client.put("/api/workspaces/python/graph", json={"revision": 0, "data": valid})).status_code == 200
+    assert (await client.get("/api/workspaces/python/graph")).json()["data"] == valid

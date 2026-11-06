@@ -63,7 +63,8 @@ An authenticated same-origin request can `GET` or `PUT`
 The response includes persisted `revision` and `data`. Keep the returned revision
 for the next write; reload on 409. Missing document returns 404. Invalid/slashed
 skill identifiers, unsupported document types and extra top-level identity fields
-are rejected. A new skill needs no global shared graph. The UI lists saved
+are rejected. NUL and unpaired surrogate strings unsupported by PG JSONB
+return 422; literal escape text and valid Unicode remain supported. A new skill needs no global shared graph. The UI lists saved
 artifacts; a browser document editor is not implemented.
 
 ## Verification
@@ -83,7 +84,7 @@ Integration fixtures verify the socket root, DB name, marker and actual server
 `data_directory` **before** dropping tables. No default shared-service connection
 exists. A sandbox may require permission for PostgreSQL OS shared memory.
 
-As of this checkpoint: 54 tests passed on disposable PG17; 9 unit tests passed
+As of this checkpoint: 58 tests passed on disposable PG17; 10 unit tests passed
 without a DB. New foundation/model/encryption coverage 93%. These tests validate
 core PG models and HTTP behavior, not AGE/PGVector graph queries. Dependency
 security audit, container/browser QA, infrastructure admission, deployment and

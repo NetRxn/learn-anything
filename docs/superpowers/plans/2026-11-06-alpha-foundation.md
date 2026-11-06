@@ -70,3 +70,11 @@ restart durability. Freeze unused OAuth until real identity mapping exists.
 - Dependency security audit was not run (no advisory service/network access used).
   Containers, extension engine, browser layout, infra, deployment and owner
   acceptance are unverified. Parent independent review precedes push/merge.
+
+- Independent review fixes: percent-encoded credentials reproduced an Alembic
+  ConfigParser error; regression now verifies exact encoded URL reaches the
+  SQLAlchemy boundary. Escaped percent signs only for ConfigParser storage.
+  PG JSONB NUL keys/values and lone surrogates reproduced HTTP500; explicit
+  recursive validation now422, valid escape text/Unicode round-trip unchanged.
+- Reviewed-fix full verification:58 passed in18.63s, coverage93%; migration replay
+  and independent-process authenticated readback PASS. No provider calls.
